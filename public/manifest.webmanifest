@@ -1,1 +1,19 @@
 
+{
+  "name": "T3xaskobold GameHub",
+  "short_name": "GameHub",
+  "description": "Deine Twitch-Community entscheidet, was als Nächstes gezockt wird!",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0c0b16",
+  "theme_color": "#0c0b16",
+  "icons": [
+    {
+      "src": "/8DA70EE8-D516-419D-8219-6A8D1348B4B4.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
