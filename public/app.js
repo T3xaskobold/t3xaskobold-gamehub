@@ -4,16 +4,13 @@ import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js';
 
 const $ = id => document.getElementById(id);
 
-const esc = s => String(s ?? '').replace(
-  /[&<>"']/g,
-  c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c])
-);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+}[c]));
 
 let db;
 let user = null;
@@ -22,13 +19,16 @@ let admin = false;
 const coverCache = new Map();
 
 function notice(message) {
-  $('notice').textContent = message;
-  $('notice').style.display = 'block';
+  const el = $('notice');
+  if (!el) return;
+
+  el.textContent = message;
+  el.style.display = 'block';
 
   clearTimeout(window.noticeTimer);
 
   window.noticeTimer = setTimeout(() => {
-    $('notice').style.display = 'none';
+    el.style.display = 'none';
   }, 5000);
 }
 
@@ -40,25 +40,56 @@ function empty() {
   return '<div class="empty">Hier ist noch Platz für neue Abenteuer 🎮</div>';
 }
 
+// NEUE KATEGORIE: ABGEBROCHENE GAMES
+
+function ensureAbandonedSection() {
+  if ($('abandoned')) return;
+
+  const played = $('played');
+  if (!played) return;
+
+  const section = document.createElement('section');
+
+  section.id = 'abandonedSection';
+
+  section.innerHTML = `
+    <h2>
+      ❌ Abgebrochene Games
+      <span id="abandonedCount">0</span>
+    </h2>
+    <div id="abandoned" class="grid"></div>
+  `;
+
+  const adminSection = $('adminSection');
+
+  if (adminSection?.parentElement) {
+    adminSection.before(section);
+  } else {
+    played.parentElement.after(section);
+  }
+}
+
 // SPIELEKARTEN MIT AUTOMATISCHEN COVERN
 
 function card(g, type, counts, voted) {
   const n = counts.get(g.id) || 0;
 
-  const label =
-    type === 'suggested' ? 'SPIELVORSCHLAG' :
-    type === 'planned' ? 'DEMNÄCHST' :
-    'GESPIELT';
+  const label = {
+    suggested: 'SPIELVORSCHLAG',
+    planned: 'DEMNÄCHST',
+    played: 'GESPIELT',
+    abandoned: 'ABGEBROCHEN'
+  }[type] || 'GAME';
 
   return `
     <article class="game">
-      <div class="game-cover-wrap">
+      <div class="game-cover-wrap" style="display:none">
         <img
           class="game-cover"
           data-cover-title="${esc(g.title)}"
           alt="Cover von ${esc(g.title)}"
-          loading="lazy"
-          hidden
+          loading="eager"
+          style="display:none"
         >
       </div>
 
@@ -87,7 +118,9 @@ function card(g, type, counts, voted) {
 // COVER ÜBER UNSERE API LADEN
 
 async function getGameCover(title) {
-  const key = title.trim().toLowerCase();
+  const key = String(title || '').trim().toLowerCase();
+
+  if (!key) return null;
 
   if (coverCache.has(key)) {
     return coverCache.get(key);
@@ -99,27 +132,42 @@ async function getGameCover(title) {
     );
 
     if (!response.ok) {
-      throw new Error('Cover-API nicht erreichbar');
+      throw new Error(`Cover-API: HTTP ${response.status}`);
     }
 
     const data = await response.json();
-    const cover = data.cover || null;
 
-    coverCache.set(key, cover);
+    const cover =
+      typeof data.cover === 'string' &&
+      data.cover.startsWith('https://')
+        ? data.cover
+        : null;
+
+    if (cover) {
+      coverCache.set(key, cover);
+    }
+
     return cover;
 
   } catch (error) {
-    console.warn('Cover konnte nicht geladen werden:', title, error);
+    console.warn(
+      'Cover konnte nicht geladen werden:',
+      title,
+      error
+    );
+
     return null;
   }
 }
 
 async function loadGameCovers() {
-  const images = document.querySelectorAll('[data-cover-title]');
+  const images = [
+    ...document.querySelectorAll('img[data-cover-title]')
+  ];
 
   const titles = [
     ...new Set(
-      [...images].map(img => img.dataset.coverTitle)
+      images.map(img => img.dataset.coverTitle)
     )
   ];
 
@@ -132,21 +180,38 @@ async function loadGameCovers() {
 
   const covers = new Map(results);
 
-  images.forEach(img => {
+  for (const img of images) {
     const cover = covers.get(img.dataset.coverTitle);
 
-    if (!cover) return;
+    if (!cover || !img.isConnected) continue;
+
+    const wrap = img.closest('.game-cover-wrap');
 
     img.onload = () => {
+      if (!img.isConnected) return;
+
       img.hidden = false;
+      img.style.display = 'block';
+
+      if (wrap) {
+        wrap.style.display = 'block';
+      }
     };
 
     img.onerror = () => {
-      img.hidden = true;
+      img.style.display = 'none';
+
+      if (wrap) {
+        wrap.style.display = 'none';
+      }
     };
 
     img.src = cover;
-  });
+
+    if (img.complete && img.naturalWidth > 0) {
+      img.onload();
+    }
+  }
 }
 
 // TWITCH LOGIN
@@ -155,7 +220,8 @@ async function login() {
   const { error } = await db.auth.signInWithOAuth({
     provider: 'twitch',
     options: {
-      redirectTo: window.location.origin + window.location.pathname
+      redirectTo:
+        window.location.origin + window.location.pathname
     }
   });
 
@@ -163,7 +229,10 @@ async function login() {
 }
 
 async function refreshAuth() {
-  const { data: { user: u }, error } = await db.auth.getUser();
+  const {
+    data: { user: u },
+    error
+  } = await db.auth.getUser();
 
   if (error && error.name !== 'AuthSessionMissingError') {
     throw error;
@@ -174,7 +243,9 @@ async function refreshAuth() {
 
   if (user) {
     const result = await db.rpc('is_gamehub_admin');
+
     check(result);
+
     admin = result.data === true;
   }
 
@@ -194,14 +265,17 @@ async function refreshAuth() {
       ' ';
 
     const btn = document.createElement('button');
+
     btn.className = 'secondary';
     btn.textContent = 'Logout';
 
     btn.onclick = async () => {
       try {
         check(await db.auth.signOut());
+
         await refreshAuth();
         await load();
+
       } catch (e) {
         notice(e.message);
       }
@@ -228,6 +302,8 @@ async function refreshAuth() {
 // SPIELE UND VORSCHLÄGE LADEN
 
 async function load() {
+  ensureAbandonedSection();
+
   const [gr, sr] = await Promise.all([
     db.from('games')
       .select('id,title,description,status')
@@ -258,6 +334,7 @@ async function load() {
       .in('suggestion_id', ids);
 
     check(vr);
+
     votes = vr.data || [];
   }
 
@@ -283,19 +360,30 @@ async function load() {
     g => g.status === 'played'
   );
 
+  const abandoned = games.filter(
+    g => g.status === 'abandoned'
+  );
+
   for (const [id, items, type] of [
     ['suggested', approved, 'suggested'],
     ['planned', planned, 'planned'],
-    ['played', played, 'played']
+    ['played', played, 'played'],
+    ['abandoned', abandoned, 'abandoned']
   ]) {
-    $(id + 'Count').textContent = items.length;
+    const count = $(id + 'Count');
+    const target = $(id);
 
-    $(id).innerHTML = items.length
+    if (!target) continue;
+
+    if (count) {
+      count.textContent = items.length;
+    }
+
+    target.innerHTML = items.length
       ? items.map(g => card(g, type, counts, voted)).join('')
       : empty();
   }
 
-  // Cover im Hintergrund laden, ohne die restliche Seite zu blockieren
   loadGameCovers().catch(console.warn);
 
   // ABSTIMMUNGEN
@@ -388,6 +476,10 @@ async function load() {
                 Gespielt
               </button>
 
+              <button data-game="${g.id}" data-gstatus="abandoned">
+                ❌ Abgebrochen
+              </button>
+
               <button class="danger" data-gdelete="${g.id}">
                 Löschen
               </button>
@@ -438,11 +530,31 @@ async function load() {
 
     document.querySelectorAll('[data-gstatus]').forEach(b => {
       b.onclick = async () => {
+        const id = Number(b.dataset.game);
+        const status = b.dataset.gstatus;
+
+        const game = games.find(g => g.id === id);
+
+        if (!game) return;
+
+        const update = { status };
+
+        if (status === 'abandoned') {
+          const answer = prompt(
+            'Warum wurde das Spiel abgebrochen? (optional)',
+            game.description || ''
+          );
+
+          if (answer === null) return;
+
+          update.description = answer.trim();
+        }
+
         try {
           check(
             await db.from('games')
-              .update({ status: b.dataset.gstatus })
-              .eq('id', Number(b.dataset.game))
+              .update(update)
+              .eq('id', id)
           );
 
           await load();
@@ -535,7 +647,10 @@ $('gameForm').addEventListener('submit', async e => {
 
 (async () => {
   if (SUPABASE_PUBLISHABLE_KEY.startsWith('HIER_')) {
-    notice('Bitte zuerst den Publishable Key in public/config.js eintragen.');
+    notice(
+      'Bitte zuerst den Publishable Key in public/config.js eintragen.'
+    );
+
     $('account').textContent = 'Konfiguration fehlt';
     return;
   }
