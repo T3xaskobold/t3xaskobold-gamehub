@@ -407,3 +407,15 @@ footer {
     height: 240px;
   }
 }
+
+/* GameHub: Cover-Bilder korrekt anzeigen */
+.game-cover-wrap:has(.game-cover:not([hidden])) {
+  display: block;
+}
+
+.game-cover:not([hidden]) {
+  display: block;
+  width: 100%;
+  height: 280px;
+  object-fit: contain;
+}
