@@ -7,10 +7,17 @@ export default async function handler(req, res) {
   }
 
   const title = String(req.query.title || '').trim();
+  const search = String(req.query.search || '').trim();
 
-  if (!title || title.length > 150) {
+  if (!title && !search) {
     return res.status(400).json({
-      error: 'Ungültiger Spielname'
+      error: 'Spielname oder Suchbegriff fehlt'
+    });
+  }
+
+  if (title.length > 150 || search.length > 150) {
+    return res.status(400).json({
+      error: 'Suchbegriff zu lang'
     });
   }
 
@@ -58,12 +65,14 @@ export default async function handler(req, res) {
       throw new Error('Kein Twitch-Token erhalten');
     }
 
-    // Spielnamen für die IGDB-Suche vorbereiten
-    const safeTitle = title
+    const query = search || title;
+
+    // Sonderzeichen für die IGDB-Suche bereinigen
+    const safeQuery = query
       .replace(/["\\]/g, ' ')
       .replace(/[;\r\n]/g, ' ');
 
-    // Cover in der IGDB-Datenbank suchen
+    // Spiele bei IGDB suchen
     const gameResponse = await fetch(
       'https://api.igdb.com/v4/games',
       {
@@ -73,7 +82,11 @@ export default async function handler(req, res) {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'text/plain'
         },
-        body: `search "${safeTitle}"; fields name,cover.image_id; limit 10;`
+        body: `
+          search "${safeQuery}";
+          fields name,cover.image_id;
+          limit 30;
+        `
       }
     );
 
@@ -89,9 +102,50 @@ export default async function handler(req, res) {
     }
 
     const games = await gameResponse.json();
+
+    // Passende Cover-URL erzeugen
+    const coverUrl = game =>
+      game.cover?.image_id
+        ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.image_id}.jpg`
+        : null;
+
+    res.setHeader(
+      'Cache-Control',
+      's-maxage=3600, stale-while-revalidate=86400'
+    );
+
+    // NEU: Suchvorschläge für die Eingabefelder
+    if (search) {
+      const normalized = search.toLocaleLowerCase();
+
+      const suggestions = games
+        .filter(game => game.name)
+        .sort((a, b) => {
+          const aStarts = a.name
+            .toLocaleLowerCase()
+            .startsWith(normalized);
+
+          const bStarts = b.name
+            .toLocaleLowerCase()
+            .startsWith(normalized);
+
+          return Number(bStarts) - Number(aStarts);
+        })
+        .slice(0, 10)
+        .map(game => ({
+          id: game.id,
+          name: game.name,
+          cover: coverUrl(game)
+        }));
+
+      return res.status(200).json({
+        suggestions
+      });
+    }
+
+    // BISHER: Cover für eine vorhandene Spielekarte
     const normalizedTitle = title.toLocaleLowerCase();
 
-    // Möglichst genau passenden Spieletitel auswählen
     const match =
       games.find(game =>
         game.name?.toLocaleLowerCase() === normalizedTitle &&
@@ -99,26 +153,15 @@ export default async function handler(req, res) {
       ) ||
       games.find(game => game.cover?.image_id);
 
-    const cover = match?.cover?.image_id
-      ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${match.cover.image_id}.jpg`
-      : null;
-
-    // Ergebnisse zwischenspeichern
-    res.setHeader(
-      'Cache-Control',
-      's-maxage=86400, stale-while-revalidate=604800'
-    );
-
     return res.status(200).json({
-      cover
+      cover: match ? coverUrl(match) : null
     });
 
   } catch (error) {
-    console.error('Cover-Suche:', error);
+    console.error('IGDB-Fehler:', error);
 
     return res.status(502).json({
-      error: 'Cover konnte nicht geladen werden'
+      error: 'Spieldaten konnten nicht geladen werden'
     });
   }
 }
-
