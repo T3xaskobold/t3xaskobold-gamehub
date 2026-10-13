@@ -217,6 +217,78 @@ form button {
   justify-self: start;
 }
 
+/* NEU: INTELLIGENTE SPIELSUCHE */
+
+.game-search-wrapper {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.game-search-wrapper input {
+  width: 100%;
+}
+
+.game-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #1c162c;
+  border: 1px solid #7750b7;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 14px 35px #000a;
+}
+
+.game-search-results[hidden] {
+  display: none !important;
+}
+
+.game-search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 11px;
+  margin: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #f4f0ff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+.game-search-item:hover,
+.game-search-item:focus-visible {
+  background: #382653;
+  outline: none;
+}
+
+.game-search-item img {
+  width: 42px;
+  height: 56px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #100d1d;
+}
+
+.game-search-item span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
 /* SPIELEBEREICHE */
 
 .sectionHeading {
@@ -361,6 +433,7 @@ form button {
   padding: 16px;
   display: none;
   box-shadow: 0 8px 40px #0009;
+  z-index: 200;
 }
 
 /* FOOTER */
@@ -406,9 +479,18 @@ footer {
   .game-cover {
     height: 240px;
   }
+
+  .game-search-results {
+    max-height: 300px;
+  }
+
+  .game-search-item {
+    min-height: 62px;
+  }
 }
 
-/* GameHub: Cover-Bilder korrekt anzeigen */
+/* COVER-BILDER KORREKT ANZEIGEN */
+
 .game-cover-wrap:has(.game-cover:not([hidden])) {
   display: block;
 }
