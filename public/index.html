@@ -8,18 +8,87 @@
 
   <title>T3xaskobold | GameHub</title>
 
-  <!-- Design -->
   <link rel="stylesheet" href="./style.css">
 
-  <!-- GameHub als Handy-App -->
+  <!-- GameHub-App -->
   <link rel="manifest" href="./manifest.webmanifest">
-  <link
-    rel="apple-touch-icon"
-    href="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png"
-  >
+  <link rel="apple-touch-icon" href="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="GameHub">
+
+  <style>
+    .app-install-banner {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 20px 0 28px;
+      padding: 18px;
+      border: 1px solid rgba(179, 109, 255, .5);
+      border-radius: 18px;
+      background: linear-gradient(135deg, #291747, #171123);
+    }
+
+    .app-install-banner[hidden],
+    .app-install-help[hidden] {
+      display: none !important;
+    }
+
+    .app-install-icon {
+      width: 76px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 2px solid #9d58e7;
+      flex-shrink: 0;
+    }
+
+    .app-install-text {
+      flex: 1 1 170px;
+    }
+
+    .app-install-text strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .app-install-text p {
+      margin: 0;
+      opacity: .85;
+      line-height: 1.5;
+    }
+
+    .app-install-button {
+      background: #9850ed;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .app-install-help {
+      width: 100%;
+      background: rgba(0, 0, 0, .3);
+      border-radius: 12px;
+      padding: 14px;
+      line-height: 1.7;
+    }
+
+    .app-install-help p {
+      margin: 0 0 8px;
+    }
+
+    @media (max-width: 600px) {
+      .app-install-button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -31,13 +100,9 @@
     </a>
 
     <nav>
-      <a
-        href="https://www.twitch.tv/t3xaskobold"
-        target="_blank"
-        rel="noopener"
-      >
-        💜 Twitch
-      </a>
+      <a href="https://www.twitch.tv/t3xaskobold"
+         target="_blank"
+         rel="noopener">💜 Twitch</a>
 
       <div id="account">Lade…</div>
     </nav>
@@ -45,12 +110,49 @@
 
   <main>
 
+    <!-- APP INSTALLIEREN -->
+
+    <section
+      id="appInstallBanner"
+      class="app-install-banner"
+      hidden
+    >
+      <img
+        class="app-install-icon"
+        src="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png"
+        alt="Unser T3xaskobold-Kobold"
+      >
+
+      <div class="app-install-text">
+        <strong>👾 GameHub immer dabei!</strong>
+        <p>
+          Installiere unsere kostenlose GameHub-App
+          mit dem lila Kobold auf deinem Handy! 💜
+        </p>
+      </div>
+
+      <button
+        id="appInstallButton"
+        class="app-install-button"
+        type="button"
+        aria-controls="appInstallHelp"
+        aria-expanded="false"
+      >
+        📲 App installieren
+      </button>
+
+      <div
+        id="appInstallHelp"
+        class="app-install-help"
+        hidden
+        aria-live="polite"
+      ></div>
+    </section>
+
     <!-- STARTBEREICH -->
 
     <section class="hero">
-      <div class="eyebrow">
-        ✦ COMMUNITY GAME HUB ✦
-      </div>
+      <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
 
       <h1>
         Deine Ideen.<br>
@@ -88,12 +190,10 @@
       </div>
     </section>
 
-    <!-- COMMUNITY-VORSCHLÄGE -->
+    <!-- SPIEL VORSCHLAGEN -->
 
     <section id="vorschlagen" class="panel">
-      <span class="eyebrow">
-        DEINE STIMME ZÄHLT
-      </span>
+      <span class="eyebrow">DEINE STIMME ZÄHLT</span>
 
       <h2>💡 Spiel vorschlagen</h2>
 
@@ -106,7 +206,6 @@
       <form id="suggestForm">
 
         <label for="title">Spielname</label>
-
         <input
           id="title"
           maxlength="100"
@@ -118,7 +217,6 @@
         <label for="description">
           Warum dieses Spiel? (optional)
         </label>
-
         <textarea
           id="description"
           maxlength="500"
@@ -138,16 +236,11 @@
     <section>
       <div class="sectionHeading">
         <div>
-          <span class="eyebrow">
-            COMMUNITY FAVORITEN
-          </span>
-
+          <span class="eyebrow">COMMUNITY FAVORITEN</span>
           <h2>🏆 Eure Spielwünsche</h2>
         </div>
 
-        <p>
-          Ein Twitch-Account, eine Stimme pro Vorschlag.
-        </p>
+        <p>Ein Twitch-Account, eine Stimme pro Vorschlag.</p>
       </div>
 
       <div id="suggested" class="grid"></div>
@@ -158,10 +251,7 @@
     <section>
       <div class="sectionHeading">
         <div>
-          <span class="eyebrow">
-            BALD IM STREAM
-          </span>
-
+          <span class="eyebrow">BALD IM STREAM</span>
           <h2>🚀 Geplante Games</h2>
         </div>
       </div>
@@ -174,10 +264,7 @@
     <section>
       <div class="sectionHeading">
         <div>
-          <span class="eyebrow">
-            ERFOLGREICH GEZOCKT
-          </span>
-
+          <span class="eyebrow">ERFOLGREICH GEZOCKT</span>
           <h2>✅ Bereits gespielt</h2>
         </div>
       </div>
@@ -185,45 +272,30 @@
       <div id="played" class="grid"></div>
     </section>
 
-    <!--
-      Die Kategorie "Abgebrochene Games"
-      wird weiterhin automatisch durch app.js
-      eingefügt.
-    -->
+    <!-- Abgebrochene Games: automatisch durch app.js -->
 
-    <!-- ADMIN-BEREICH -->
+    <!-- ADMIN -->
 
     <section id="adminSection" class="panel hidden">
-
-      <span class="eyebrow">
-        NUR FÜR DEN KANALINHABER
-      </span>
+      <span class="eyebrow">NUR FÜR DEN KANALINHABER</span>
 
       <h2>🛡️ Admin-Bereich</h2>
-
       <h3>Neues Spiel</h3>
 
       <form id="gameForm">
 
         <label for="gameTitle">Spielname</label>
-
-        <input
-          id="gameTitle"
-          required
-          maxlength="150"
-        >
+        <input id="gameTitle" required maxlength="150">
 
         <label for="gameDescription">
           Beschreibung (optional)
         </label>
-
         <textarea
           id="gameDescription"
           maxlength="2000"
         ></textarea>
 
         <label for="gameStatus">Status</label>
-
         <select id="gameStatus">
           <option value="planned">Geplant</option>
           <option value="playing">Wird gespielt</option>
@@ -234,7 +306,6 @@
         <button type="submit" class="primary">
           Spiel hinzufügen
         </button>
-
       </form>
 
       <h3>Vorschläge verwalten</h3>
@@ -242,14 +313,9 @@
 
       <h3>Spiele verwalten</h3>
       <div id="adminGames"></div>
-
     </section>
 
-    <div
-      id="notice"
-      role="status"
-      aria-live="polite"
-    ></div>
+    <div id="notice" role="status" aria-live="polite"></div>
 
   </main>
 
@@ -261,6 +327,68 @@
   </footer>
 
   <script type="module" src="./app.js"></script>
+
+  <!-- Installationsbutton -->
+  <script>
+    (function () {
+      const banner = document.getElementById("appInstallBanner");
+      const button = document.getElementById("appInstallButton");
+      const help = document.getElementById("appInstallHelp");
+
+      let installPrompt = null;
+
+      const standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        navigator.standalone === true;
+
+      if (standalone) return;
+
+      banner.hidden = false;
+
+      window.addEventListener("beforeinstallprompt", function (event) {
+        event.preventDefault();
+        installPrompt = event;
+      });
+
+      window.addEventListener("appinstalled", function () {
+        banner.hidden = true;
+      });
+
+      button.addEventListener("click", async function () {
+        if (installPrompt) {
+          const event = installPrompt;
+          installPrompt = null;
+          await event.prompt();
+          return;
+        }
+
+        const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if (ios) {
+          help.innerHTML =
+            "<p><strong>📱 GameHub auf dem iPhone installieren:</strong></p>" +
+            "<p>1. Öffne GameHub in Safari.</p>" +
+            "<p>2. Tippe auf das Teilen-Symbol " +
+            "(Quadrat mit Pfeil nach oben).</p>" +
+            "<p>3. Wähle <strong>Zum Home-Bildschirm</strong>.</p>" +
+            "<p>4. Tippe auf <strong>Hinzufügen</strong>.</p>" +
+            "<p>Fertig! 👾💜</p>";
+        } else {
+          help.innerHTML =
+            "<p><strong>📲 GameHub installieren:</strong></p>" +
+            "<p>Öffne das Browser-Menü und wähle " +
+            "<strong>App installieren</strong> oder " +
+            "<strong>Zum Startbildschirm hinzufügen</strong>.</p>";
+        }
+
+        help.hidden = !help.hidden;
+        button.setAttribute(
+          "aria-expanded",
+          String(!help.hidden)
+        );
+      });
+    })();
+  </script>
 
 </body>
 </html>
