@@ -40,7 +40,148 @@ function empty() {
   return '<div class="empty">Hier ist noch Platz für neue Abenteuer 🎮</div>';
 }
 
-// NEUE KATEGORIE: ABGEBROCHENE GAMES
+// INTELLIGENTE SPIELSUCHE FÜR COMMUNITY UND ADMIN
+
+function setupGameSearch(inputId) {
+  const input = $(inputId);
+  if (!input) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'game-search-wrapper';
+
+  input.parentNode.insertBefore(wrapper, input);
+  wrapper.appendChild(input);
+
+  const list = document.createElement('div');
+  list.className = 'game-search-results';
+  list.setAttribute('role', 'listbox');
+  list.setAttribute('aria-label', 'Spielvorschläge');
+
+  wrapper.appendChild(list);
+
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('aria-autocomplete', 'list');
+
+  let timer;
+  let controller;
+  let sequence = 0;
+
+  function close() {
+    list.replaceChildren();
+    list.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+  }
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    controller?.abort();
+
+    const request = ++sequence;
+    const query = input.value.trim();
+
+    close();
+
+    if (query.length < 2) return;
+
+    timer = setTimeout(async () => {
+      controller = new AbortController();
+
+      try {
+        const response = await fetch(
+          `/api/game-cover?search=${encodeURIComponent(query)}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (
+          request !== sequence ||
+          input.value.trim() !== query
+        ) return;
+
+        const suggestions = Array.isArray(data.suggestions)
+          ? data.suggestions
+          : [];
+
+        for (const game of suggestions) {
+          if (typeof game.name !== 'string') continue;
+
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'game-search-item';
+          button.setAttribute('role', 'option');
+
+          if (
+            typeof game.cover === 'string' &&
+            game.cover.startsWith('https://images.igdb.com/')
+          ) {
+            const img = document.createElement('img');
+
+            img.src = game.cover;
+            img.alt = '';
+            img.loading = 'lazy';
+
+            button.appendChild(img);
+          }
+
+          const name = document.createElement('span');
+          name.textContent = game.name;
+
+          button.appendChild(name);
+
+          button.addEventListener('click', () => {
+            input.value = game.name;
+
+            ++sequence;
+            clearTimeout(timer);
+            controller?.abort();
+
+            close();
+            input.focus();
+          });
+
+          list.appendChild(button);
+        }
+
+        list.hidden = list.childElementCount === 0;
+
+        input.setAttribute(
+          'aria-expanded',
+          String(!list.hidden)
+        );
+
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.warn('Spielsuche fehlgeschlagen:', error);
+        }
+      }
+    }, 300);
+  });
+
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      close();
+    }
+  });
+
+  document.addEventListener('click', event => {
+    if (!wrapper.contains(event.target)) {
+      close();
+    }
+  });
+
+  close();
+}
+
+setupGameSearch('title');
+setupGameSearch('gameTitle');
+
+// KATEGORIE: ABGEBROCHENE GAMES
 
 function ensureAbandonedSection() {
   if ($('abandoned')) return;
@@ -49,7 +190,6 @@ function ensureAbandonedSection() {
   if (!played) return;
 
   const section = document.createElement('section');
-
   section.id = 'abandonedSection';
 
   section.innerHTML = `
