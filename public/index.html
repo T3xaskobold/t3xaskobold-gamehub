@@ -79,7 +79,7 @@
       margin: 0 0 8px;
     }
 
-    /* LIVESTREAM-NAVIGATION */
+    /* NAVIGATION */
 
     .stream-nav-button {
       display: inline-flex;
@@ -106,14 +106,16 @@
       outline-offset: 3px;
     }
 
-    /* STREAM-SEITE */
+    /* SEITEN */
 
     .stream-page[hidden],
-    .gamehub-page[hidden] {
+    .gamehub-page[hidden],
+    .statistics-page[hidden] {
       display: none !important;
     }
 
-    .stream-page {
+    .stream-page,
+    .statistics-page {
       padding: 20px 0 36px;
     }
 
@@ -131,6 +133,8 @@
       opacity: .85;
       line-height: 1.6;
     }
+
+    /* LIVESTREAM */
 
     .stream-layout {
       display: grid;
@@ -213,6 +217,55 @@
       margin: 12px 0;
     }
 
+    /* STATISTIK-SEITE */
+
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .statistics-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      padding: 22px 12px;
+      border: 1px solid rgba(179,109,255,.4);
+      border-radius: 16px;
+      background: linear-gradient(135deg,#291747,#171123);
+      text-align: center;
+    }
+
+    .statistics-card span {
+      font-size: 1.7rem;
+    }
+
+    .statistics-card strong {
+      color: #d6a8ff;
+      font-size: 2rem;
+    }
+
+    .statistics-card small {
+      color: #d6c8e6;
+      font-size: .9rem;
+    }
+
+    .statistics-panel {
+      margin: 20px 0;
+      padding: 20px 16px;
+      border: 1px solid rgba(179,109,255,.35);
+      border-radius: 18px;
+      background: #171123;
+    }
+
+    .statistics-panel h2 {
+      margin-top: 0;
+    }
+
     /* SOCIALS */
 
     .social-section {
@@ -283,8 +336,6 @@
       background: #a52943;
     }
 
-    /* NUR DAS ORIGINAL-SYMBOL, OHNE ICON-RAHMEN */
-
     .social-icon {
       display: block;
       width: 24px;
@@ -311,6 +362,12 @@
       }
     }
 
+    @media (min-width: 750px) {
+      .statistics-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
     @media (min-width: 650px) {
       .social-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -327,7 +384,7 @@
 
 <body>
 
-  <!-- SVG-LOGOS: EINMAL DEFINIERT, ÜBERALL VERWENDBAR -->
+  <!-- SOCIAL-MEDIA-LOGOS -->
 
   <svg xmlns="http://www.w3.org/2000/svg"
        aria-hidden="true"
@@ -364,6 +421,12 @@
         🔴 Livestream
       </a>
 
+      <a class="stream-nav-button"
+         href="#statistiken"
+         id="statsNavButton">
+        📊 Statistiken
+      </a>
+
       <a href="https://www.twitch.tv/t3xaskobold"
          target="_blank"
          rel="noopener noreferrer">💜 Twitch</a>
@@ -396,13 +459,11 @@
 
         <div class="stream-box">
           <h2>🎥 Twitch-Livestream</h2>
-
           <div class="stream-player" id="twitchPlayerContainer"></div>
         </div>
 
         <div class="stream-box">
           <h2>💬 Live-Chat</h2>
-
           <div class="stream-chat" id="twitchChatContainer"></div>
         </div>
 
@@ -492,7 +553,7 @@
         </div>
       </section>
 
-      <!-- PERSÖNLICHER SUPPORT-TEXT -->
+      <!-- SUPPORT-TEXT -->
 
       <div class="stream-info">
         💜 <strong>Danke für deinen Support!</strong>
@@ -512,6 +573,96 @@
           Danke, dass du Teil der Kobold-Community bist! 👾💜
         </strong>
       </div>
+
+    </section>
+
+    <!-- NEUE STATISTIK-SEITE -->
+
+    <section id="statisticsPage"
+             class="statistics-page"
+             aria-label="GameHub-Statistiken"
+             hidden>
+
+      <div class="stream-page-heading">
+        <span class="eyebrow">✦ COMMUNITY IN ZAHLEN ✦</span>
+
+        <h1>📊 Kobold-Statistiken</h1>
+
+        <p>
+          Unsere Abenteuer, Spielwünsche und
+          Community-Abstimmungen auf einen Blick! 👾💜
+        </p>
+      </div>
+
+      <div class="statistics-grid">
+
+        <div class="statistics-card">
+          <span>🎮</span>
+          <strong id="statTotalGames">0</strong>
+          <small>Spiele insgesamt</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>🟢</span>
+          <strong id="statPlaying">0</strong>
+          <small>Aktuell gespielt</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>✅</span>
+          <strong id="statPlayed">0</strong>
+          <small>Gespielt</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>🚀</span>
+          <strong id="statPlanned">0</strong>
+          <small>Geplant</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>⏸️</span>
+          <strong id="statPaused">0</strong>
+          <small>Pausiert</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>❌</span>
+          <strong id="statAbandoned">0</strong>
+          <small>Abgebrochen</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>💡</span>
+          <strong id="statSuggestions">0</strong>
+          <small>Spielvorschläge</small>
+        </div>
+
+        <div class="statistics-card">
+          <span>💜</span>
+          <strong id="statVotes">0</strong>
+          <small>Abstimmungen</small>
+        </div>
+
+      </div>
+
+      <section class="statistics-panel">
+        <h2>📈 Spieleverteilung</h2>
+        <div id="statisticsChart">
+          <p>Statistiken werden geladen …</p>
+        </div>
+      </section>
+
+      <section class="statistics-panel">
+        <h2>🏆 Top 5 Community-Wünsche</h2>
+        <div id="statisticsTopFive">
+          <p>Spielwünsche werden geladen …</p>
+        </div>
+      </section>
+
+      <a class="stream-nav-button" href="#gamehub">
+        🎮 Zurück zum GameHub
+      </a>
 
     </section>
 
@@ -570,7 +721,7 @@
         </a>
       </section>
 
-      <!-- STATISTIKEN -->
+      <!-- KLEINE STATISTIKEN AUF DER STARTSEITE -->
 
       <section class="stats">
         <div>
@@ -833,12 +984,14 @@
 
   <script type="module" src="./app.js"></script>
 
-  <!-- LIVESTREAM-NAVIGATION UND TWITCH-EINBINDUNG -->
+  <!-- NAVIGATION UND TWITCH-EINBINDUNG -->
 
   <script>
     (function () {
       const streamPage = document.getElementById("livestreamPage");
+      const statisticsPage = document.getElementById("statisticsPage");
       const gamehubPage = document.getElementById("gamehubPage");
+
       const playerContainer = document.getElementById("twitchPlayerContainer");
       const chatContainer = document.getElementById("twitchChatContainer");
 
@@ -895,10 +1048,14 @@
       }
 
       function showPage() {
-        const livestream = window.location.hash === "#livestream";
+        const hash = window.location.hash;
+
+        const livestream = hash === "#livestream";
+        const statistics = hash === "#statistiken";
 
         streamPage.hidden = !livestream;
-        gamehubPage.hidden = livestream;
+        statisticsPage.hidden = !statistics;
+        gamehubPage.hidden = livestream || statistics;
 
         if (livestream) {
           loadStream();
@@ -907,7 +1064,14 @@
           chatContainer.replaceChildren();
         }
 
-        window.scrollTo(0, 0);
+        if (
+          livestream ||
+          statistics ||
+          hash === "#gamehub" ||
+          hash === ""
+        ) {
+          window.scrollTo(0, 0);
+        }
       }
 
       window.addEventListener("hashchange", showPage);
@@ -915,7 +1079,7 @@
     })();
   </script>
 
-  <!-- APP-INSTALLATION BEIBEHALTEN -->
+  <!-- APP-INSTALLATION -->
 
   <script>
     (function () {
