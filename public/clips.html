@@ -1,1 +1,386 @@
 
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0b16">
+  <title>🎬 Kobold-Clips | T3xaskobold GameHub</title>
+  <link rel="stylesheet" href="./style.css">
+
+  <style>
+    body {
+      background: #0c0b16;
+      color: #fff;
+    }
+
+    .clips-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #47305e;
+    }
+
+    .clips-brand {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .clips-home {
+      padding: 11px 14px;
+      background: #6924ad;
+      border-radius: 12px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .clips-main {
+      width: min(1100px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 60px;
+    }
+
+    .clips-heading {
+      text-align: center;
+      margin: 18px auto 30px;
+    }
+
+    .clips-heading h1 {
+      font-size: clamp(2rem, 7vw, 3.5rem);
+      margin: 12px 0;
+    }
+
+    .clips-heading p {
+      color: #d4c3e3;
+      line-height: 1.6;
+    }
+
+    .clips-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .clips-toolbar button {
+      background: #6924ad;
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .clips-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, 280px), 1fr)
+      );
+      gap: 18px;
+    }
+
+    .clip-card {
+      overflow: hidden;
+      border: 1px solid #49315e;
+      border-radius: 18px;
+      background: #1a1327;
+    }
+
+    .clip-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      padding: 0;
+      border: 0;
+      background: #09070e;
+      cursor: pointer;
+      display: block;
+    }
+
+    .clip-preview img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .clip-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: rgba(105,36,173,.94);
+      color: white;
+      font-size: 25px;
+    }
+
+    .clip-video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 0;
+    }
+
+    .clip-details {
+      padding: 15px;
+    }
+
+    .clip-details h2 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      overflow-wrap: anywhere;
+    }
+
+    .clip-meta {
+      color: #cbb7dc;
+      font-size: .85rem;
+      line-height: 1.5;
+    }
+
+    .clip-link {
+      display: inline-block;
+      margin-top: 13px;
+      color: #d5a1ff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .clips-message {
+      padding: 24px;
+      text-align: center;
+      border: 1px solid #49315e;
+      border-radius: 16px;
+      background: #1a1327;
+      line-height: 1.6;
+    }
+
+    .clips-bottom {
+      display: flex;
+      justify-content: center;
+      margin-top: 36px;
+    }
+
+    .clips-bottom a {
+      padding: 14px 20px;
+      border-radius: 12px;
+      background: #6924ad;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="clips-header">
+    <a class="clips-brand" href="./index.html#gamehub">
+      🎮 T3xaskobold
+    </a>
+
+    <a class="clips-home" href="./index.html#gamehub">
+      ☰ GameHub
+    </a>
+  </header>
+
+  <main class="clips-main">
+    <div class="clips-heading">
+      <div>✦ DIE BESTEN STREAM-MOMENTE ✦</div>
+      <h1>🎬 Kobold-Clips</h1>
+      <p>
+        Die neuesten Highlights direkt von Twitch!
+        Automatisch aktualisiert, ohne manuelles Hochladen. 👾💜
+      </p>
+    </div>
+
+    <div class="clips-toolbar">
+      <strong id="clipsCount">🎬 Twitch-Clips</strong>
+
+      <button id="refreshClips" type="button">
+        🔄 Clips aktualisieren
+      </button>
+    </div>
+
+    <div id="clipsStatus" class="clips-message" role="status">
+      🎬 Twitch-Clips werden geladen …
+    </div>
+
+    <div id="clipsGrid" class="clips-grid"></div>
+
+    <div class="clips-bottom">
+      <a href="./index.html#gamehub">
+        🎮 Zurück zum GameHub
+      </a>
+    </div>
+  </main>
+
+  <script>
+    const grid = document.getElementById("clipsGrid");
+    const statusBox = document.getElementById("clipsStatus");
+    const countBox = document.getElementById("clipsCount");
+    const refreshButton = document.getElementById("refreshClips");
+
+    function createElement(tag, className, text) {
+      const element = document.createElement(tag);
+
+      if (className) {
+        element.className = className;
+      }
+
+      if (text !== undefined) {
+        element.textContent = text;
+      }
+
+      return element;
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+
+      return new Date(value).toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+
+    function renderClip(clip) {
+      const card = createElement("article", "clip-card");
+
+      const preview = createElement("button", "clip-preview");
+      preview.type = "button";
+      preview.setAttribute(
+        "aria-label",
+        "Clip abspielen: " + (clip.title || "Twitch-Clip")
+      );
+
+      const image = createElement("img");
+      image.src = clip.thumbnail_url;
+      image.alt = clip.title || "Twitch-Clip";
+      image.loading = "lazy";
+
+      const playIcon = createElement("span", "clip-play", "▶");
+
+      preview.append(image, playIcon);
+
+      preview.addEventListener("click", function () {
+        const iframe = createElement("iframe", "clip-video");
+
+        const url = new URL(
+          "https://clips.twitch.tv/embed"
+        );
+
+        url.searchParams.set("clip", clip.id);
+        url.searchParams.set("parent", location.hostname);
+        url.searchParams.set("autoplay", "true");
+
+        iframe.src = url.toString();
+        iframe.title = clip.title || "Twitch-Clip";
+        iframe.allow = "autoplay; fullscreen";
+        iframe.allowFullscreen = true;
+
+        preview.replaceWith(iframe);
+      });
+
+      const details = createElement("div", "clip-details");
+
+      const title = createElement(
+        "h2",
+        "",
+        clip.title || "Twitch-Clip"
+      );
+
+      const meta = createElement(
+        "div",
+        "clip-meta",
+        "👀 " +
+        Number(clip.view_count || 0).toLocaleString("de-DE") +
+        " Aufrufe · 📅 " +
+        formatDate(clip.created_at)
+      );
+
+      const link = createElement(
+        "a",
+        "clip-link",
+        "💜 Auf Twitch ansehen ↗"
+      );
+
+      link.href = clip.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      details.append(title, meta, link);
+      card.append(preview, details);
+
+      return card;
+    }
+
+    async function loadClips() {
+      refreshButton.disabled = true;
+      refreshButton.textContent = "⏳ Lädt …";
+
+      statusBox.hidden = false;
+      statusBox.textContent = "🎬 Twitch-Clips werden geladen …";
+      grid.replaceChildren();
+
+      try {
+        const response = await fetch(
+          "/api/clips",
+          { cache: "no-store" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Twitch-Clips konnten nicht geladen werden."
+          );
+        }
+
+        const clips = Array.isArray(data.clips)
+          ? data.clips
+          : [];
+
+        countBox.textContent = "🎬 " + clips.length + " Clips";
+
+        if (clips.length === 0) {
+          statusBox.textContent =
+            "👾 Twitch hat momentan keine Clips zurückgegeben.";
+          return;
+        }
+
+        statusBox.hidden = true;
+
+        for (const clip of clips) {
+          grid.appendChild(renderClip(clip));
+        }
+
+      } catch (error) {
+        statusBox.hidden = false;
+        statusBox.textContent =
+          "⚠️ Clips konnten nicht geladen werden: " +
+          error.message;
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "🔄 Clips aktualisieren";
+      }
+    }
+
+    refreshButton.addEventListener("click", loadClips);
+    loadClips();
+  </script>
+</body>
+</html>
