@@ -16,6 +16,8 @@
   <meta name="apple-mobile-web-app-title" content="GameHub">
 
   <style>
+    /* APP INSTALLIEREN */
+
     .app-install-banner {
       display: flex;
       align-items: center;
@@ -79,13 +81,144 @@
       margin: 0 0 8px;
     }
 
-    /* NAVIGATION */
+    /* NEUER HEADER MIT HAMBURGER-MENÜ */
+
+    .hub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: nowrap;
+    }
+
+    .hub-header .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1 1 auto;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .hub-header .brand strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hub-header .brand span {
+      font-size: .7rem;
+      letter-spacing: .12em;
+    }
+
+    .hub-menu {
+      position: relative;
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    .hub-menu-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 48px;
+      padding: 0;
+      border: 1px solid rgba(179,109,255,.6);
+      border-radius: 13px;
+      background: #6924ad;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .hub-menu-button svg {
+      width: 26px;
+      height: 26px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    .hub-menu-button:hover {
+      background: #8436d3;
+    }
+
+    .hub-menu-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 1000;
+      width: min(290px, calc(100vw - 32px));
+      padding: 10px;
+      border: 1px solid rgba(179,109,255,.6);
+      border-radius: 16px;
+      background: #1d142d;
+      box-shadow: 0 16px 35px rgba(0,0,0,.45);
+    }
+
+    .hub-menu-panel[hidden] {
+      display: none !important;
+    }
+
+    .hub-menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 48px;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border-radius: 11px;
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .hub-menu-link:hover,
+    .hub-menu-link.active {
+      background: rgba(157,88,231,.28);
+    }
+
+    .hub-menu-divider {
+      height: 1px;
+      margin: 8px 4px;
+      background: rgba(179,109,255,.25);
+    }
+
+    .hub-account {
+      margin-top: 8px;
+      padding: 10px 6px 4px;
+      border-top: 1px solid rgba(179,109,255,.25);
+    }
+
+    .hub-account button {
+      max-width: 100%;
+      white-space: normal;
+    }
+
+    .hub-account span {
+      display: block;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .hub-menu-button:focus-visible,
+    .hub-menu-link:focus-visible,
+    .stream-nav-button:focus-visible,
+    .stream-action:focus-visible,
+    .social-link:focus-visible {
+      outline: 3px solid #d4a5ff;
+      outline-offset: 3px;
+    }
+
+    /* SEITENNAVIGATION */
 
     .stream-nav-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 15px;
+      padding: 12px 16px;
       border: 1px solid rgba(179,109,255,.65);
       border-radius: 12px;
       background: #6924ad;
@@ -98,15 +231,6 @@
     .stream-nav-button:hover {
       background: #8436d3;
     }
-
-    .stream-nav-button:focus-visible,
-    .stream-action:focus-visible,
-    .social-link:focus-visible {
-      outline: 3px solid #d4a5ff;
-      outline-offset: 3px;
-    }
-
-    /* SEITEN */
 
     .stream-page[hidden],
     .gamehub-page[hidden],
@@ -132,6 +256,12 @@
     .stream-page-heading p {
       opacity: .85;
       line-height: 1.6;
+    }
+
+    .page-back-link {
+      display: flex;
+      justify-content: center;
+      margin: 28px 0 6px;
     }
 
     /* LIVESTREAM */
@@ -378,6 +508,16 @@
       .stream-actions {
         grid-template-columns: 1fr;
       }
+
+      .hub-header .brand span {
+        font-size: .6rem;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .hub-header .brand span {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -408,31 +548,70 @@
 
   </svg>
 
-  <header>
+  <!-- HEADER MIT NEUEM MENÜ -->
+
+  <header class="hub-header">
+
     <a class="brand" href="#gamehub" id="brandHome">
       🎮 <strong>T3xaskobold</strong>
       <span>GAMEHUB</span>
     </a>
 
-    <nav>
-      <a class="stream-nav-button"
-         href="#livestream"
-         id="streamNavButton">
-        🔴 Livestream
-      </a>
+    <div class="hub-menu" id="hubMenu">
 
-      <a class="stream-nav-button"
-         href="#statistiken"
-         id="statsNavButton">
-        📊 Statistiken
-      </a>
+      <button
+        class="hub-menu-button"
+        id="hubMenuButton"
+        type="button"
+        aria-label="Menü öffnen"
+        aria-expanded="false"
+        aria-controls="hubMenuPanel"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
 
-      <a href="https://www.twitch.tv/t3xaskobold"
-         target="_blank"
-         rel="noopener noreferrer">💜 Twitch</a>
+      <nav class="hub-menu-panel"
+           id="hubMenuPanel"
+           aria-label="Hauptnavigation"
+           hidden>
 
-      <div id="account">Lade…</div>
-    </nav>
+        <a class="hub-menu-link"
+           href="#gamehub"
+           data-hub-page="gamehub">
+          🎮 GameHub
+        </a>
+
+        <a class="hub-menu-link"
+           href="#livestream"
+           data-hub-page="livestream">
+          🔴 Livestream
+        </a>
+
+        <a class="hub-menu-link"
+           href="#statistiken"
+           data-hub-page="statistiken">
+          📊 Statistiken
+        </a>
+
+        <div class="hub-menu-divider"></div>
+
+        <a class="hub-menu-link"
+           href="https://www.twitch.tv/t3xaskobold"
+           target="_blank"
+           rel="noopener noreferrer">
+          💜 Twitch-Kanal ↗
+        </a>
+
+        <div id="account" class="hub-account">
+          Lade…
+        </div>
+
+      </nav>
+
+    </div>
+
   </header>
 
   <main>
@@ -574,9 +753,17 @@
         </strong>
       </div>
 
+      <!-- NEU: ZURÜCK ZUM GAMEHUB GANZ UNTEN -->
+
+      <div class="page-back-link">
+        <a class="stream-nav-button" href="#gamehub">
+          🎮 Zurück zum GameHub
+        </a>
+      </div>
+
     </section>
 
-    <!-- NEUE STATISTIK-SEITE -->
+    <!-- STATISTIK-SEITE -->
 
     <section id="statisticsPage"
              class="statistics-page"
@@ -660,9 +847,11 @@
         </div>
       </section>
 
-      <a class="stream-nav-button" href="#gamehub">
-        🎮 Zurück zum GameHub
-      </a>
+      <div class="page-back-link">
+        <a class="stream-nav-button" href="#gamehub">
+          🎮 Zurück zum GameHub
+        </a>
+      </div>
 
     </section>
 
@@ -984,10 +1173,14 @@
 
   <script type="module" src="./app.js"></script>
 
-  <!-- NAVIGATION UND TWITCH-EINBINDUNG -->
+  <!-- HAMBURGER-MENÜ UND SEITENNAVIGATION -->
 
   <script>
     (function () {
+      const menu = document.getElementById("hubMenu");
+      const menuButton = document.getElementById("hubMenuButton");
+      const menuPanel = document.getElementById("hubMenuPanel");
+
       const streamPage = document.getElementById("livestreamPage");
       const statisticsPage = document.getElementById("statisticsPage");
       const gamehubPage = document.getElementById("gamehubPage");
@@ -997,6 +1190,38 @@
 
       const channel = "t3xaskobold";
       const parent = window.location.hostname;
+
+      function setMenuOpen(open) {
+        menuPanel.hidden = !open;
+        menuButton.setAttribute("aria-expanded", String(open));
+        menuButton.setAttribute(
+          "aria-label",
+          open ? "Menü schließen" : "Menü öffnen"
+        );
+      }
+
+      menuButton.addEventListener("click", function () {
+        setMenuOpen(menuPanel.hidden);
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!menu.contains(event.target)) {
+          setMenuOpen(false);
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !menuPanel.hidden) {
+          setMenuOpen(false);
+          menuButton.focus();
+        }
+      });
+
+      menuPanel.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          setMenuOpen(false);
+        });
+      });
 
       function makeIframe(src, title, allow) {
         const iframe = document.createElement("iframe");
@@ -1056,6 +1281,26 @@
         streamPage.hidden = !livestream;
         statisticsPage.hidden = !statistics;
         gamehubPage.hidden = livestream || statistics;
+
+        const activePage = livestream
+          ? "livestream"
+          : statistics
+            ? "statistiken"
+            : "gamehub";
+
+        menuPanel.querySelectorAll("[data-hub-page]").forEach(function (link) {
+          const active = link.dataset.hubPage === activePage;
+
+          link.classList.toggle("active", active);
+
+          if (active) {
+            link.setAttribute("aria-current", "page");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+
+        setMenuOpen(false);
 
         if (livestream) {
           loadStream();
