@@ -81,7 +81,7 @@
       margin: 0 0 8px;
     }
 
-    /* HEADER MIT HAMBURGER-MENÜ */
+    /* HEADER UND HAMBURGER-MENÜ */
 
     .hub-header {
       display: flex;
@@ -207,7 +207,8 @@
     .hub-menu-link:focus-visible,
     .stream-nav-button:focus-visible,
     .stream-action:focus-visible,
-    .social-link:focus-visible {
+    .social-link:focus-visible,
+    .kobold-live-banner:focus-visible {
       outline: 3px solid #d4a5ff;
       outline-offset: 3px;
     }
@@ -347,7 +348,7 @@
       margin: 12px 0;
     }
 
-    /* STATISTIK-SEITE */
+    /* STATISTIKEN */
 
     .statistics-grid {
       display: grid;
@@ -450,21 +451,10 @@
       transform: translateY(-2px);
     }
 
-    .social-link.discord {
-      background: #4645a5;
-    }
-
-    .social-link.tiktok {
-      background: #24202d;
-    }
-
-    .social-link.instagram {
-      background: #813a78;
-    }
-
-    .social-link.youtube {
-      background: #a52943;
-    }
+    .social-link.discord { background: #4645a5; }
+    .social-link.tiktok { background: #24202d; }
+    .social-link.instagram { background: #813a78; }
+    .social-link.youtube { background: #a52943; }
 
     .social-icon {
       display: block;
@@ -481,9 +471,108 @@
       flex-basis: 27px;
     }
 
+    /* NEU: AUTOMATISCHE LIVE-ANZEIGE */
+
+    .kobold-live-banner {
+      display: block;
+      margin: 18px 0 24px;
+      padding: 18px;
+      border: 1px solid rgba(64,220,125,.8);
+      border-radius: 18px;
+      background: linear-gradient(135deg,#17372b,#181827 75%);
+      box-shadow: 0 0 24px rgba(46,200,112,.12);
+      color: #fff;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .kobold-live-banner[hidden] {
+      display: none !important;
+    }
+
+    .kobold-live-banner:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(46,200,112,.22);
+    }
+
+    .kobold-live-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: #62f29d;
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+    }
+
+    .kobold-live-antenna {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .kobold-live-antenna svg {
+      width: 25px;
+      height: 25px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .kobold-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(98,242,157,.45);
+      border-radius: 999px;
+      background: rgba(36,155,85,.14);
+      color: #62f29d;
+      font-weight: 900;
+    }
+
+    .kobold-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #62f29d;
+      box-shadow: 0 0 0 4px rgba(98,242,157,.15);
+      animation: kobold-live-pulse 1.5s infinite;
+    }
+
+    .kobold-live-title {
+      display: block;
+      margin-bottom: 8px;
+      font-size: clamp(1.25rem,4.5vw,1.65rem);
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .kobold-live-description {
+      display: block;
+      color: #d8e9df;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .kobold-live-action {
+      display: block;
+      margin-top: 16px;
+      color: #62f29d;
+      font-weight: 800;
+    }
+
+    @keyframes kobold-live-pulse {
+      50% { opacity: .35; }
+    }
+
     @media (min-width: 950px) {
       .stream-layout {
-        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+        grid-template-columns: minmax(0,2fr) minmax(320px,1fr);
       }
 
       .stream-chat {
@@ -494,13 +583,13 @@
 
     @media (min-width: 750px) {
       .statistics-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(4,minmax(0,1fr));
       }
     }
 
     @media (min-width: 650px) {
       .social-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(4,minmax(0,1fr));
       }
     }
 
@@ -548,7 +637,7 @@
 
   </svg>
 
-  <!-- HEADER MIT MENÜ -->
+  <!-- HEADER -->
 
   <header class="hub-header">
 
@@ -595,10 +684,7 @@
           📊 Statistiken
         </a>
 
-        <!-- TWITCH-CLIPS -->
-
-        <a class="hub-menu-link"
-           href="./clips.html">
+        <a class="hub-menu-link" href="./clips.html">
           🎬 Clips
         </a>
 
@@ -616,9 +702,7 @@
         </div>
 
       </nav>
-
     </div>
-
   </header>
 
   <main>
@@ -678,14 +762,11 @@
           ⭐ Kanal abonnieren
         </a>
 
-        <a class="stream-action secondary"
-           href="#gamehub">
+        <a class="stream-action secondary" href="#gamehub">
           🎮 Zum GameHub
         </a>
 
       </div>
-
-      <!-- SOCIALS IM LIVESTREAM -->
 
       <section class="social-section" aria-label="Social Media">
         <h2>🌐 Werde Teil der Kobold-Community!</h2>
@@ -739,8 +820,6 @@
         </div>
       </section>
 
-      <!-- SUPPORT-TEXT -->
-
       <div class="stream-info">
         💜 <strong>Danke für deinen Support!</strong>
 
@@ -777,7 +856,6 @@
 
       <div class="stream-page-heading">
         <span class="eyebrow">✦ COMMUNITY IN ZAHLEN ✦</span>
-
         <h1>📊 Kobold-Statistiken</h1>
 
         <p>
@@ -898,34 +976,84 @@
              aria-live="polite"></div>
       </section>
 
+      <!-- NEU: LIVE-FENSTER NUR WENN WIRKLICH LIVE -->
+
+      <a id="koboldLiveBanner"
+         class="kobold-live-banner"
+         href="#livestream"
+         aria-label="T3xaskobold ist live. Zum Livestream wechseln."
+         hidden>
+
+        <div class="kobold-live-top">
+
+          <span class="kobold-live-antenna">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20v-8"/>
+              <path d="M8 20h8"/>
+              <circle cx="12" cy="9" r="2"/>
+              <path d="M7.5 4.5a6.4 6.4 0 0 0 0 9"/>
+              <path d="M16.5 4.5a6.4 6.4 0 0 1 0 9"/>
+              <path d="M4.5 1.5a10.5 10.5 0 0 0 0 15"/>
+              <path d="M19.5 1.5a10.5 10.5 0 0 1 0 15"/>
+            </svg>
+            STREAM-STATUS
+          </span>
+
+          <span class="kobold-live-badge">
+            <span class="kobold-live-dot"></span>
+            LIVE
+          </span>
+
+        </div>
+
+        <strong class="kobold-live-title">
+          🎮 T3xaskobold ist LIVE!
+        </strong>
+
+        <span class="kobold-live-description"
+              id="koboldLiveDescription">
+          Jetzt einschalten und gemeinsam zocken! 💜
+        </span>
+
+        <span class="kobold-live-action">
+          🎥 Zum Livestream ↗
+        </span>
+
+      </a>
+
       <!-- STARTBEREICH -->
 
       <section class="hero">
         <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
+
         <h1>
           Deine Ideen.<br>
           <em>Unsere Abenteuer.</em>
         </h1>
+
         <p>
           Entdecke unsere Games, stimme für Spielwünsche
           ab und sieh, was gerade im Stream läuft.
         </p>
+
         <a class="primary" href="#vorschlagen">
           🎯 Spiel vorschlagen
         </a>
       </section>
 
-      <!-- KLEINE STATISTIKEN AUF DER STARTSEITE -->
+      <!-- KLEINE STATISTIKEN -->
 
       <section class="stats">
         <div>
           <b id="playedCount">0</b>
           <small>Gespielt</small>
         </div>
+
         <div>
           <b id="plannedCount">0</b>
           <small>Geplant</small>
         </div>
+
         <div>
           <b id="suggestedCount">0</b>
           <small>Vorschläge</small>
@@ -937,6 +1065,7 @@
       <section id="vorschlagen" class="panel">
         <span class="eyebrow">DEINE STIMME ZÄHLT</span>
         <h2>💡 Spiel vorschlagen</h2>
+
         <p>
           Melde dich mit Twitch an und schlage ein Spiel vor.
           Vorschläge erscheinen nach der Freigabe.
@@ -953,6 +1082,7 @@
           <label for="description">
             Warum dieses Spiel? (optional)
           </label>
+
           <textarea id="description"
                     maxlength="500"
                     rows="3"
@@ -973,6 +1103,7 @@
             <span class="category-arrow">⌄</span>
           </span>
         </summary>
+
         <div class="category-content">
           <p>Ein Twitch-Account, eine Stimme pro Vorschlag.</p>
           <div id="suggested" class="grid"></div>
@@ -990,7 +1121,9 @@
 
       <!-- SUCHE UND SORTIERUNG -->
 
-      <section class="game-filters" aria-label="Spiele suchen und sortieren">
+      <section class="game-filters"
+               aria-label="Spiele suchen und sortieren">
+
         <label for="gameFilter">🔎 Spiele suchen</label>
         <input id="gameFilter"
                type="search"
@@ -998,9 +1131,15 @@
 
         <label for="gameSort">Sortieren nach</label>
         <select id="gameSort">
-          <option value="alphabetical">🔤 Alphabetisch (A–Z)</option>
-          <option value="newest">🆕 Zuletzt hinzugefügt</option>
-          <option value="lastPlayed">🎮 Zuletzt gespielt</option>
+          <option value="alphabetical">
+            🔤 Alphabetisch (A–Z)
+          </option>
+          <option value="newest">
+            🆕 Zuletzt hinzugefügt
+          </option>
+          <option value="lastPlayed">
+            🎮 Zuletzt gespielt
+          </option>
         </select>
       </section>
 
@@ -1014,6 +1153,7 @@
             <span class="category-arrow">⌄</span>
           </span>
         </summary>
+
         <div class="category-content">
           <div id="paused" class="grid"></div>
         </div>
@@ -1030,6 +1170,7 @@
             <span class="category-arrow">⌄</span>
           </span>
         </summary>
+
         <div class="category-content">
           <div id="planned" class="grid"></div>
         </div>
@@ -1046,6 +1187,7 @@
             <span class="category-arrow">⌄</span>
           </span>
         </summary>
+
         <div class="category-content">
           <div id="played" class="grid"></div>
         </div>
@@ -1062,6 +1204,7 @@
             <span class="category-arrow">⌄</span>
           </span>
         </summary>
+
         <div class="category-content">
           <div id="abandoned" class="grid"></div>
         </div>
@@ -1074,6 +1217,7 @@
         <h2>🛡️ Admin-Bereich</h2>
 
         <h3>Neues Spiel</h3>
+
         <form id="gameForm">
           <label for="gameTitle">Spielname</label>
           <input id="gameTitle" required maxlength="150">
@@ -1081,10 +1225,12 @@
           <label for="gameDescription">
             Beschreibung (optional)
           </label>
+
           <textarea id="gameDescription"
                     maxlength="2000"></textarea>
 
           <label for="gameStatus">Status</label>
+
           <select id="gameStatus">
             <option value="planned">🚀 Geplant</option>
             <option value="playing">🟢 Aktuell gespielt</option>
@@ -1105,10 +1251,11 @@
         <div id="adminGames"></div>
       </section>
 
-      <!-- SOCIALS GANZ UNTEN IM GAMEHUB -->
+      <!-- SOCIALS IM GAMEHUB -->
 
       <section class="social-section" aria-label="Social Media">
         <h2>💜 Folge dem Kobold!</h2>
+
         <p>
           Auf Discord, TikTok, Instagram und YouTube
           gibt es noch mehr von unserer Community! 👾
@@ -1169,12 +1316,15 @@
 
   <footer>
     Made for 💜 T3xaskobold ·
+
     <a href="https://www.twitch.tv/t3xaskobold"
        target="_blank"
        rel="noopener noreferrer">
       Twitch-Kanal
     </a>
   </footer>
+
+  <!-- BESTEHENDE GAMEHUB-FUNKTIONEN -->
 
   <script type="module" src="./app.js"></script>
 
@@ -1190,15 +1340,23 @@
       const statisticsPage = document.getElementById("statisticsPage");
       const gamehubPage = document.getElementById("gamehubPage");
 
-      const playerContainer = document.getElementById("twitchPlayerContainer");
-      const chatContainer = document.getElementById("twitchChatContainer");
+      const playerContainer =
+        document.getElementById("twitchPlayerContainer");
+
+      const chatContainer =
+        document.getElementById("twitchChatContainer");
 
       const channel = "t3xaskobold";
       const parent = window.location.hostname;
 
       function setMenuOpen(open) {
         menuPanel.hidden = !open;
-        menuButton.setAttribute("aria-expanded", String(open));
+
+        menuButton.setAttribute(
+          "aria-expanded",
+          String(open)
+        );
+
         menuButton.setAttribute(
           "aria-label",
           open ? "Menü schließen" : "Menü öffnen"
@@ -1230,6 +1388,7 @@
 
       function makeIframe(src, title, allow) {
         const iframe = document.createElement("iframe");
+
         iframe.src = src;
         iframe.title = title;
         iframe.allowFullscreen = true;
@@ -1245,6 +1404,7 @@
       function loadStream() {
         if (!playerContainer.firstElementChild) {
           const playerUrl = new URL("https://player.twitch.tv/");
+
           playerUrl.searchParams.set("channel", channel);
           playerUrl.searchParams.set("parent", parent);
           playerUrl.searchParams.set("autoplay", "false");
@@ -1293,17 +1453,20 @@
             ? "statistiken"
             : "gamehub";
 
-        menuPanel.querySelectorAll("[data-hub-page]").forEach(function (link) {
-          const active = link.dataset.hubPage === activePage;
+        menuPanel
+          .querySelectorAll("[data-hub-page]")
+          .forEach(function (link) {
+            const active =
+              link.dataset.hubPage === activePage;
 
-          link.classList.toggle("active", active);
+            link.classList.toggle("active", active);
 
-          if (active) {
-            link.setAttribute("aria-current", "page");
-          } else {
-            link.removeAttribute("aria-current");
-          }
-        });
+            if (active) {
+              link.setAttribute("aria-current", "page");
+            } else {
+              link.removeAttribute("aria-current");
+            }
+          });
 
         setMenuOpen(false);
 
@@ -1333,9 +1496,14 @@
 
   <script>
     (function () {
-      const banner = document.getElementById("appInstallBanner");
-      const button = document.getElementById("appInstallButton");
-      const help = document.getElementById("appInstallHelp");
+      const banner =
+        document.getElementById("appInstallBanner");
+
+      const button =
+        document.getElementById("appInstallButton");
+
+      const help =
+        document.getElementById("appInstallHelp");
 
       let installPrompt = null;
 
@@ -1347,10 +1515,13 @@
 
       banner.hidden = false;
 
-      window.addEventListener("beforeinstallprompt", function (event) {
-        event.preventDefault();
-        installPrompt = event;
-      });
+      window.addEventListener(
+        "beforeinstallprompt",
+        function (event) {
+          event.preventDefault();
+          installPrompt = event;
+        }
+      );
 
       window.addEventListener("appinstalled", function () {
         banner.hidden = true;
@@ -1364,7 +1535,8 @@
           return;
         }
 
-        const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const ios =
+          /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
         if (ios) {
           help.innerHTML =
@@ -1383,6 +1555,7 @@
         }
 
         help.hidden = !help.hidden;
+
         button.setAttribute(
           "aria-expanded",
           String(!help.hidden)
@@ -1390,5 +1563,91 @@
       });
     })();
   </script>
+
+  <!-- NEU: AUTOMATISCHER TWITCH-LIVE-STATUS -->
+
+  <script>
+    (function () {
+      const banner =
+        document.getElementById("koboldLiveBanner");
+
+      const description =
+        document.getElementById("koboldLiveDescription");
+
+      if (!banner || !description) return;
+
+      // Diese Adresse muss zu deiner API-Datei passen:
+      const LIVE_API_URL = "/api/live-status";
+
+      async function checkTwitchLive() {
+        try {
+          const response = await fetch(LIVE_API_URL, {
+            cache: "no-store"
+          });
+
+          if (!response.ok) {
+            throw new Error("Twitch-API nicht erreichbar");
+          }
+
+          const data = await response.json();
+
+          if (typeof data.live !== "boolean") {
+            throw new Error("Ungültige API-Antwort");
+          }
+
+          if (data.live === true) {
+            const details = [];
+
+            if (data.game) {
+              details.push("🎮 " + data.game);
+            }
+
+            if (data.title) {
+              details.push(data.title);
+            }
+
+            description.textContent = details.length
+              ? details.join(" · ")
+              : "Jetzt einschalten und gemeinsam zocken! 💜";
+
+            banner.hidden = false;
+          } else {
+            // OFFLINE: GAR NICHTS ANZEIGEN
+            banner.hidden = true;
+          }
+
+        } catch (error) {
+          // BEI FEHLER: EBENFALLS NICHTS ANZEIGEN
+          banner.hidden = true;
+
+          console.warn(
+            "Twitch-LIVE-Status konnte nicht geprüft werden:",
+            error
+          );
+        }
+      }
+
+      // Beim Öffnen der Webseite prüfen
+      checkTwitchLive();
+
+      // Alle 60 Sekunden erneut prüfen
+      setInterval(function () {
+        if (!document.hidden) {
+          checkTwitchLive();
+        }
+      }, 60000);
+
+      // Beim Zurückkehren zur Webseite erneut prüfen
+      document.addEventListener(
+        "visibilitychange",
+        function () {
+          if (!document.hidden) {
+            checkTwitchLive();
+          }
+        }
+      );
+    })();
+  </script>
+
 </body>
 </html>
