@@ -100,7 +100,8 @@
     }
 
     .stream-nav-button:focus-visible,
-    .stream-action:focus-visible {
+    .stream-action:focus-visible,
+    .social-link:focus-visible {
       outline: 3px solid #d4a5ff;
       outline-offset: 3px;
     }
@@ -212,6 +213,75 @@
       margin: 12px 0;
     }
 
+    /* SOCIAL-MEDIA-BEREICH */
+
+    .social-section {
+      margin: 22px 0;
+      padding: 20px 16px;
+      border: 1px solid rgba(179,109,255,.35);
+      border-radius: 18px;
+      background: linear-gradient(
+        135deg,
+        rgba(105,36,173,.2),
+        rgba(23,17,35,.9)
+      );
+      text-align: center;
+    }
+
+    .social-section h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+    }
+
+    .social-section p {
+      margin: 0 0 18px;
+      opacity: .85;
+      line-height: 1.5;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 54px;
+      padding: 12px 8px;
+      border: 1px solid rgba(179,109,255,.45);
+      border-radius: 13px;
+      background: #392052;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
+
+    .social-link:hover {
+      background: #6924ad;
+      transform: translateY(-2px);
+    }
+
+    .social-link.discord {
+      background: #4645a5;
+    }
+
+    .social-link.tiktok {
+      background: #24202d;
+    }
+
+    .social-link.instagram {
+      background: #813a78;
+    }
+
+    .social-link.youtube {
+      background: #a52943;
+    }
+
     @media (min-width: 950px) {
       .stream-layout {
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
@@ -220,6 +290,12 @@
       .stream-chat {
         height: 100%;
         min-height: 460px;
+      }
+    }
+
+    @media (min-width: 650px) {
+      .social-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
 
@@ -323,6 +399,48 @@
 
       </div>
 
+      <!-- SOCIALS AUF DER LIVESTREAM-SEITE -->
+
+      <section class="social-section" aria-label="Social Media">
+        <h2>🌐 Werde Teil der Kobold-Community!</h2>
+        <p>
+          Folge mir auf meinen Socials und verpasse
+          keine Highlights oder Community-Aktionen! 👾💜
+        </p>
+
+        <div class="social-grid">
+
+          <a class="social-link discord"
+             href="https://discord.com/invite/XHG3h3M7CQ"
+             target="_blank"
+             rel="noopener noreferrer">
+            💬 Discord
+          </a>
+
+          <a class="social-link tiktok"
+             href="https://www.tiktok.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            🎵 TikTok
+          </a>
+
+          <a class="social-link instagram"
+             href="https://instagram.com/maxx_t3"
+             target="_blank"
+             rel="noopener noreferrer">
+            📸 Instagram
+          </a>
+
+          <a class="social-link youtube"
+             href="https://youtube.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            ▶️ YouTube
+          </a>
+
+        </div>
+      </section>
+
       <!-- PERSÖNLICHER SUPPORT-TEXT -->
 
       <div class="stream-info">
@@ -399,6 +517,48 @@
         <a class="primary" href="#vorschlagen">
           🎯 Spiel vorschlagen
         </a>
+      </section>
+
+      <!-- SOCIALS AUF DER STARTSEITE -->
+
+      <section class="social-section" aria-label="Social Media">
+        <h2>💜 Folge dem Kobold!</h2>
+        <p>
+          Auf Discord, TikTok, Instagram und YouTube
+          gibt es noch mehr von unserer Community! 👾
+        </p>
+
+        <div class="social-grid">
+
+          <a class="social-link discord"
+             href="https://discord.com/invite/XHG3h3M7CQ"
+             target="_blank"
+             rel="noopener noreferrer">
+            💬 Discord
+          </a>
+
+          <a class="social-link tiktok"
+             href="https://www.tiktok.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            🎵 TikTok
+          </a>
+
+          <a class="social-link instagram"
+             href="https://instagram.com/maxx_t3"
+             target="_blank"
+             rel="noopener noreferrer">
+            📸 Instagram
+          </a>
+
+          <a class="social-link youtube"
+             href="https://youtube.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            ▶️ YouTube
+          </a>
+
+        </div>
       </section>
 
       <!-- STATISTIKEN -->
@@ -513,7 +673,7 @@
           <span class="category-right">
             <span id="plannedCategoryCount"
                   class="category-count">0</span>
-            <span class="category-arrow">⌄</span>
+          <span class="category-arrow">⌄</span>
           </span>
         </summary>
         <div class="category-content">
@@ -545,8 +705,8 @@
           <span class="category-right">
             <span id="abandonedCount"
                   class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
+            <span class="category-arrow">⌄</span>
+          </span>
         </summary>
         <div class="category-content">
           <div id="abandoned" class="grid"></div>
