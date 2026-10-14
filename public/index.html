@@ -213,10 +213,10 @@
       margin: 12px 0;
     }
 
-    /* SOCIAL-MEDIA-BEREICH */
+    /* SOCIALS */
 
     .social-section {
-      margin: 22px 0;
+      margin: 24px 0;
       padding: 20px 16px;
       border: 1px solid rgba(179,109,255,.35);
       border-radius: 18px;
@@ -249,7 +249,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 9px;
+      min-width: 0;
       min-height: 54px;
       padding: 12px 8px;
       border: 1px solid rgba(179,109,255,.45);
@@ -282,6 +283,23 @@
       background: #a52943;
     }
 
+    /* NUR DAS ORIGINAL-SYMBOL, OHNE ICON-RAHMEN */
+
+    .social-icon {
+      display: block;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+      fill: currentColor;
+      overflow: visible;
+    }
+
+    .social-icon.youtube-icon {
+      width: 27px;
+      height: 24px;
+      flex-basis: 27px;
+    }
+
     @media (min-width: 950px) {
       .stream-layout {
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
@@ -308,6 +326,31 @@
 </head>
 
 <body>
+
+  <!-- SVG-LOGOS: EINMAL DEFINIERT, ÜBERALL VERWENDBAR -->
+
+  <svg xmlns="http://www.w3.org/2000/svg"
+       aria-hidden="true"
+       style="position:absolute;width:0;height:0;overflow:hidden">
+
+    <symbol id="logo-discord" viewBox="0 0 127.14 96.36">
+      <path d="M104.4 8.18A101.27 101.27 0 0 0 79.9.5a70.08 70.08 0 0 0-3.14 6.47 93.5 93.5 0 0 0-28.39 0A68.48 68.48 0 0 0 45.2.5a101.8 101.8 0 0 0-24.5 7.68C5.2 31.11.99 53.48 3.09 75.53a101.3 101.3 0 0 0 30.04 15.18 73.9 73.9 0 0 0 6.43-10.45 65.8 65.8 0 0 1-10.12-4.88c.85-.62 1.68-1.26 2.49-1.92 19.5 9.15 40.68 9.15 59.95 0 .81.66 1.64 1.3 2.49 1.92a65.8 65.8 0 0 1-10.14 4.89 73.6 73.6 0 0 0 6.43 10.45 101.1 101.1 0 0 0 30.06-15.18c2.46-25.56-4.2-47.72-17.61-67.35ZM42.45 65.98c-5.86 0-10.68-5.37-10.68-11.97 0-6.6 4.72-12 10.68-12 6.01 0 10.78 5.41 10.68 12 0 6.6-4.72 11.97-10.68 11.97Zm42.24 0c-5.86 0-10.68-5.37-10.68-11.97 0-6.6 4.72-12 10.68-12 6.01 0 10.78 5.41 10.68 12 0 6.6-4.72 11.97-10.68 11.97Z"/>
+    </symbol>
+
+    <symbol id="logo-tiktok" viewBox="0 0 24 24">
+      <path d="M16.7 0h-4.04v16.3a3.43 3.43 0 1 1-2.95-3.4V8.8a7.5 7.5 0 1 0 7 7.49V8.03a9.43 9.43 0 0 0 5.51 1.76V5.75A5.51 5.51 0 0 1 16.7 0Z"/>
+    </symbol>
+
+    <symbol id="logo-instagram" viewBox="0 0 24 24">
+      <path d="M7.03 0C3.15 0 0 3.15 0 7.03v9.94C0 20.85 3.15 24 7.03 24h9.94c3.88 0 7.03-3.15 7.03-7.03V7.03C24 3.15 20.85 0 16.97 0H7.03Zm0 2.16h9.94a4.87 4.87 0 0 1 4.87 4.87v9.94a4.87 4.87 0 0 1-4.87 4.87H7.03a4.87 4.87 0 0 1-4.87-4.87V7.03a4.87 4.87 0 0 1 4.87-4.87ZM18 4.7a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6ZM12 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32Zm0 2.16a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/>
+    </symbol>
+
+    <symbol id="logo-youtube" viewBox="0 0 24 24">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.55 3.6 12 3.6 12 3.6s-7.55 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.05 0 12 0 12s0 3.95.5 5.8a3 3 0 0 0 2.1 2.1c1.85.5 9.4.5 9.4.5s7.55 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.85.5-5.8.5-5.8s0-3.95-.5-5.8ZM9.6 15.6V8.4l6.24 3.6-6.24 3.6Z"/>
+    </symbol>
+
+  </svg>
+
   <header>
     <a class="brand" href="#gamehub" id="brandHome">
       🎮 <strong>T3xaskobold</strong>
@@ -323,7 +366,7 @@
 
       <a href="https://www.twitch.tv/t3xaskobold"
          target="_blank"
-         rel="noopener">💜 Twitch</a>
+         rel="noopener noreferrer">💜 Twitch</a>
 
       <div id="account">Lade…</div>
     </nav>
@@ -354,17 +397,13 @@
         <div class="stream-box">
           <h2>🎥 Twitch-Livestream</h2>
 
-          <div class="stream-player" id="twitchPlayerContainer">
-            <!-- Twitch-Player wird beim Öffnen geladen -->
-          </div>
+          <div class="stream-player" id="twitchPlayerContainer"></div>
         </div>
 
         <div class="stream-box">
           <h2>💬 Live-Chat</h2>
 
-          <div class="stream-chat" id="twitchChatContainer">
-            <!-- Twitch-Chat wird beim Öffnen geladen -->
-          </div>
+          <div class="stream-chat" id="twitchChatContainer"></div>
         </div>
 
       </div>
@@ -399,7 +438,7 @@
 
       </div>
 
-      <!-- SOCIALS AUF DER LIVESTREAM-SEITE -->
+      <!-- SOCIALS IM LIVESTREAM -->
 
       <section class="social-section" aria-label="Social Media">
         <h2>🌐 Werde Teil der Kobold-Community!</h2>
@@ -414,28 +453,40 @@
              href="https://discord.com/invite/XHG3h3M7CQ"
              target="_blank"
              rel="noopener noreferrer">
-            💬 Discord
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-discord"></use>
+            </svg>
+            <span>Discord</span>
           </a>
 
           <a class="social-link tiktok"
              href="https://www.tiktok.com/@t3xaskobold"
              target="_blank"
              rel="noopener noreferrer">
-            🎵 TikTok
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-tiktok"></use>
+            </svg>
+            <span>TikTok</span>
           </a>
 
           <a class="social-link instagram"
              href="https://instagram.com/maxx_t3"
              target="_blank"
              rel="noopener noreferrer">
-            📸 Instagram
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-instagram"></use>
+            </svg>
+            <span>Instagram</span>
           </a>
 
           <a class="social-link youtube"
              href="https://youtube.com/@t3xaskobold"
              target="_blank"
              rel="noopener noreferrer">
-            ▶️ YouTube
+            <svg class="social-icon youtube-icon" aria-hidden="true">
+              <use href="#logo-youtube"></use>
+            </svg>
+            <span>YouTube</span>
           </a>
 
         </div>
@@ -464,7 +515,7 @@
 
     </section>
 
-    <!-- BISHERIGER GAMEHUB -->
+    <!-- GAMEHUB -->
 
     <div id="gamehubPage" class="gamehub-page">
 
@@ -502,7 +553,7 @@
              aria-live="polite"></div>
       </section>
 
-      <!-- KOMPAKTER STARTBEREICH -->
+      <!-- STARTBEREICH -->
 
       <section class="hero">
         <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
@@ -517,48 +568,6 @@
         <a class="primary" href="#vorschlagen">
           🎯 Spiel vorschlagen
         </a>
-      </section>
-
-      <!-- SOCIALS AUF DER STARTSEITE -->
-
-      <section class="social-section" aria-label="Social Media">
-        <h2>💜 Folge dem Kobold!</h2>
-        <p>
-          Auf Discord, TikTok, Instagram und YouTube
-          gibt es noch mehr von unserer Community! 👾
-        </p>
-
-        <div class="social-grid">
-
-          <a class="social-link discord"
-             href="https://discord.com/invite/XHG3h3M7CQ"
-             target="_blank"
-             rel="noopener noreferrer">
-            💬 Discord
-          </a>
-
-          <a class="social-link tiktok"
-             href="https://www.tiktok.com/@t3xaskobold"
-             target="_blank"
-             rel="noopener noreferrer">
-            🎵 TikTok
-          </a>
-
-          <a class="social-link instagram"
-             href="https://instagram.com/maxx_t3"
-             target="_blank"
-             rel="noopener noreferrer">
-            📸 Instagram
-          </a>
-
-          <a class="social-link youtube"
-             href="https://youtube.com/@t3xaskobold"
-             target="_blank"
-             rel="noopener noreferrer">
-            ▶️ YouTube
-          </a>
-
-        </div>
       </section>
 
       <!-- STATISTIKEN -->
@@ -578,7 +587,7 @@
         </div>
       </section>
 
-      <!-- 1. SPIELVORSCHLÄGE -->
+      <!-- SPIELVORSCHLÄGE -->
 
       <section id="vorschlagen" class="panel">
         <span class="eyebrow">DEINE STIMME ZÄHLT</span>
@@ -625,7 +634,7 @@
         </div>
       </details>
 
-      <!-- 2. AKTUELL GESPIELT -->
+      <!-- AKTUELL GESPIELT -->
 
       <section class="current-game-section">
         <div class="sectionHeading">
@@ -650,7 +659,7 @@
         </select>
       </section>
 
-      <!-- 3. PAUSIERT -->
+      <!-- PAUSIERT -->
 
       <details class="game-category" id="pausedSection">
         <summary>
@@ -665,7 +674,7 @@
         </div>
       </details>
 
-      <!-- 4. GEPLANT -->
+      <!-- GEPLANT -->
 
       <details class="game-category" id="plannedSection">
         <summary>
@@ -673,7 +682,7 @@
           <span class="category-right">
             <span id="plannedCategoryCount"
                   class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
+            <span class="category-arrow">⌄</span>
           </span>
         </summary>
         <div class="category-content">
@@ -681,7 +690,7 @@
         </div>
       </details>
 
-      <!-- 5. GESPIELT -->
+      <!-- GESPIELT -->
 
       <details class="game-category" id="playedSection">
         <summary>
@@ -697,7 +706,7 @@
         </div>
       </details>
 
-      <!-- 6. ABGEBROCHEN -->
+      <!-- ABGEBROCHEN -->
 
       <details class="game-category" id="abandonedSection">
         <summary>
@@ -749,6 +758,60 @@
 
         <h3>Spiele verwalten</h3>
         <div id="adminGames"></div>
+      </section>
+
+      <!-- SOCIALS GANZ UNTEN IM GAMEHUB -->
+
+      <section class="social-section" aria-label="Social Media">
+        <h2>💜 Folge dem Kobold!</h2>
+        <p>
+          Auf Discord, TikTok, Instagram und YouTube
+          gibt es noch mehr von unserer Community! 👾
+        </p>
+
+        <div class="social-grid">
+
+          <a class="social-link discord"
+             href="https://discord.com/invite/XHG3h3M7CQ"
+             target="_blank"
+             rel="noopener noreferrer">
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-discord"></use>
+            </svg>
+            <span>Discord</span>
+          </a>
+
+          <a class="social-link tiktok"
+             href="https://www.tiktok.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-tiktok"></use>
+            </svg>
+            <span>TikTok</span>
+          </a>
+
+          <a class="social-link instagram"
+             href="https://instagram.com/maxx_t3"
+             target="_blank"
+             rel="noopener noreferrer">
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#logo-instagram"></use>
+            </svg>
+            <span>Instagram</span>
+          </a>
+
+          <a class="social-link youtube"
+             href="https://youtube.com/@t3xaskobold"
+             target="_blank"
+             rel="noopener noreferrer">
+            <svg class="social-icon youtube-icon" aria-hidden="true">
+              <use href="#logo-youtube"></use>
+            </svg>
+            <span>YouTube</span>
+          </a>
+
+        </div>
       </section>
 
     </div>
