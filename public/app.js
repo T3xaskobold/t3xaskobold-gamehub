@@ -5,8 +5,11 @@ import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js';
 const $ = id => document.getElementById(id);
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;',
-  '"': '&quot;', "'": '&#39;'
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
 }[c]));
 
 let db;
@@ -21,10 +24,10 @@ let userVotes = new Set();
 const coverCache = new Map();
 
 const categoryConfig = [
-  { id: 'paused', title: 'Pausiert', icon: '⏸️', status: 'paused' },
-  { id: 'planned', title: 'Geplant', icon: '🚀', status: 'planned' },
-  { id: 'played', title: 'Gespielt', icon: '✅', status: 'played' },
-  { id: 'abandoned', title: 'Abgebrochen', icon: '❌', status: 'abandoned' }
+  { id: 'paused', title: 'Pausiert', icon: '⏸️' },
+  { id: 'planned', title: 'Geplant', icon: '🚀' },
+  { id: 'played', title: 'Gespielt', icon: '✅' },
+  { id: 'abandoned', title: 'Abgebrochen', icon: '❌' }
 ];
 
 function notice(message) {
@@ -59,7 +62,7 @@ function statusLabel(status) {
   })[status] || status;
 }
 
-// IGDB-SUCHE FÜR SPIELNAMEN
+// IGDB-SUCHE BEIM EINGEBEN EINES SPIELNAMENS
 
 function setupGameSearch(inputId) {
   const input = $(inputId);
@@ -106,10 +109,9 @@ function setupGameSearch(inputId) {
           { signal: controller.signal }
         );
 
-        if (!response.ok) throw new Error('Suche fehlgeschlagen');
+        if (!response.ok) throw new Error('Spielsuche fehlgeschlagen');
 
         const data = await response.json();
-
         if (currentId !== requestId) return;
 
         const suggestions = Array.isArray(data.suggestions)
@@ -117,7 +119,7 @@ function setupGameSearch(inputId) {
           : [];
 
         for (const game of suggestions) {
-          if (!game.name) continue;
+          if (typeof game.name !== 'string') continue;
 
           const button = document.createElement('button');
           button.type = 'button';
@@ -125,7 +127,7 @@ function setupGameSearch(inputId) {
 
           if (
             typeof game.cover === 'string' &&
-            game.cover.startsWith('https://images.igdb.com/')
+            game.cover.startsWith('https://')
           ) {
             const img = document.createElement('img');
             img.src = game.cover;
@@ -150,6 +152,7 @@ function setupGameSearch(inputId) {
         }
 
         list.hidden = list.childElementCount === 0;
+
       } catch (error) {
         if (error.name !== 'AbortError') {
           console.warn('IGDB-Suche:', error);
@@ -167,33 +170,23 @@ function setupGameSearch(inputId) {
   });
 }
 
-// GROSSE KATEGORIE-KACHELN
+// GROSSE LILA KATEGORIE-KACHELN
 
 function setupCategoryTiles() {
-  const pausedSection = $('pausedSection');
-  const plannedSection = $('plannedSection');
-  const playedSection = $('playedSection');
-  const abandonedSection = $('abandonedSection');
-
-  if (
-    !pausedSection ||
-    !plannedSection ||
-    !playedSection ||
-    !abandonedSection
-  ) return;
-
   const sections = [
-    pausedSection,
-    plannedSection,
-    playedSection,
-    abandonedSection
+    $('pausedSection'),
+    $('plannedSection'),
+    $('playedSection'),
+    $('abandonedSection')
   ];
+
+  if (sections.some(section => !section)) return;
 
   const tileGrid = document.createElement('div');
   tileGrid.className = 'category-tile-grid';
   tileGrid.id = 'categoryTileGrid';
 
-  pausedSection.before(tileGrid);
+  sections[0].before(tileGrid);
 
   for (const section of sections) {
     section.remove();
@@ -209,6 +202,10 @@ function setupCategoryTiles() {
     button.className = 'category-tile';
     button.dataset.openCategory = category.id;
     button.setAttribute('aria-expanded', 'false');
+    button.setAttribute(
+      'aria-controls',
+      `${category.id}Expanded`
+    );
 
     button.innerHTML = `
       <span class="category-tile-icon">${category.icon}</span>
@@ -254,6 +251,9 @@ function setupCategoryTiles() {
         button.classList.add('active');
         button.setAttribute('aria-expanded', 'true');
 
+        // Cover beim Öffnen sicher nachladen.
+        loadGameCovers().catch(console.warn);
+
         content.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest'
@@ -261,120 +261,9 @@ function setupCategoryTiles() {
       }
     });
   }
-
-  const style = document.createElement('style');
-
-  style.textContent = `
-    .category-tile-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-      margin: 26px 0;
-    }
-
-    .category-tile {
-      min-width: 0;
-      min-height: 155px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 20px;
-      border: 1px solid #7753a9;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #2b1b43, #191427);
-      color: #f6efff;
-      text-align: left;
-      cursor: pointer;
-      box-shadow: 0 6px 24px #0003;
-      transition: transform .2s, border-color .2s;
-    }
-
-    .category-tile:hover,
-    .category-tile.active {
-      border-color: #b88cff;
-      background: linear-gradient(145deg, #3b245d, #20152f);
-    }
-
-    .category-tile:active {
-      transform: scale(.98);
-    }
-
-    .category-tile-icon {
-      font-size: 35px;
-      line-height: 1.2;
-    }
-
-    .category-tile-title {
-      font-size: clamp(18px, 3vw, 25px);
-      font-weight: 800;
-      overflow-wrap: anywhere;
-    }
-
-    .category-tile-bottom {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-size: 13px;
-      color: #c5a7eb;
-    }
-
-    .category-tile-arrow {
-      font-size: 28px;
-      line-height: 1;
-    }
-
-    .category-tile.active .category-tile-arrow {
-      transform: rotate(180deg);
-    }
-
-    .category-expanded {
-      padding: 18px;
-      margin-bottom: 30px;
-      border: 1px solid #4c376c;
-      border-radius: 20px;
-      background: #171424;
-    }
-
-    .category-expanded[hidden] {
-      display: none !important;
-    }
-
-    .category-expanded .grid {
-      margin: 12px 0 0;
-    }
-
-    @media (max-width: 600px) {
-      .category-tile-grid {
-        gap: 10px;
-      }
-
-      .category-tile {
-        min-height: 140px;
-        padding: 15px;
-        border-radius: 17px;
-      }
-
-      .category-tile-icon {
-        font-size: 30px;
-      }
-
-      .category-tile-title {
-        font-size: 17px;
-      }
-
-      .category-expanded {
-        padding: 12px;
-      }
-    }
-  `;
-
-  document.head.appendChild(style);
 }
 
-// SPIELEKARTEN
+// SPIELEKARTEN MIT FESTEM COVERBEREICH
 
 function card(game, type) {
   const votes = voteCounts.get(game.id) || 0;
@@ -391,17 +280,19 @@ function card(game, type) {
 
   return `
     <article class="game">
-      <div class="game-cover-wrap" style="display:none">
+      <div class="game-cover-wrap game-cover-placeholder">
+        <span class="game-cover-fallback" aria-hidden="true">🎮</span>
         <img
           class="game-cover"
           data-cover-title="${esc(game.title)}"
           alt="Cover von ${esc(game.title)}"
           loading="lazy"
-          style="display:none"
+          hidden
         >
       </div>
 
       <div class="eyebrow">${labels[type] || 'GAME'}</div>
+
       <h3>${esc(game.title)}</h3>
 
       ${game.description
@@ -423,7 +314,7 @@ function card(game, type) {
   `;
 }
 
-// IGDB-COVER LADEN
+// IGDB-COVER AUTOMATISCH LADEN
 
 async function getGameCover(title) {
   const key = String(title || '').trim().toLowerCase();
@@ -436,21 +327,24 @@ async function getGameCover(title) {
       `/api/game-cover?title=${encodeURIComponent(title)}`
     );
 
-    if (!response.ok) throw new Error('Cover-Abfrage fehlgeschlagen');
+    if (!response.ok) {
+      throw new Error(`Cover-Abfrage: HTTP ${response.status}`);
+    }
 
     const data = await response.json();
 
     const cover =
       typeof data.cover === 'string' &&
-      data.cover.startsWith('https://')
+      /^https?:\/\//i.test(data.cover)
         ? data.cover
         : null;
 
-    coverCache.set(key, cover);
+    if (cover) coverCache.set(key, cover);
+
     return cover;
 
   } catch (error) {
-    console.warn('Cover fehlt:', title, error);
+    console.warn('Cover konnte nicht geladen werden:', title, error);
     return null;
   }
 }
@@ -464,27 +358,37 @@ async function loadGameCovers() {
     ...new Set(images.map(img => img.dataset.coverTitle))
   ];
 
-  const covers = new Map(
-    await Promise.all(
-      titles.map(async title => [title, await getGameCover(title)])
-    )
+  const results = await Promise.all(
+    titles.map(async title => [
+      title,
+      await getGameCover(title)
+    ])
   );
 
-  for (const img of images) {
-    const cover = covers.get(img.dataset.coverTitle);
-    if (!cover || !img.isConnected) continue;
+  const covers = new Map(results);
 
+  for (const img of images) {
+    if (!img.isConnected) continue;
+
+    const cover = covers.get(img.dataset.coverTitle);
     const wrap = img.closest('.game-cover-wrap');
+
+    if (!cover) continue;
 
     img.onload = () => {
       if (!img.isConnected) return;
+
       img.hidden = false;
       img.style.display = 'block';
-      if (wrap) wrap.style.display = 'block';
+
+      wrap?.classList.add('has-cover');
     };
 
     img.onerror = () => {
-      if (wrap) wrap.style.display = 'none';
+      img.hidden = true;
+      img.style.display = 'none';
+
+      wrap?.classList.remove('has-cover');
     };
 
     img.src = cover;
@@ -501,16 +405,22 @@ function sortGames(items, sort, isSuggestion = false) {
   const result = [...items];
 
   if (sort === 'alphabetical') {
-    result.sort((a, b) => a.title.localeCompare(b.title, 'de'));
+    result.sort((a, b) =>
+      a.title.localeCompare(b.title, 'de')
+    );
+
   } else if (sort === 'lastPlayed') {
     result.sort((a, b) => {
       const first = new Date(a.last_played_at || 0).getTime();
       const second = new Date(b.last_played_at || 0).getTime();
+
       return second - first;
     });
+
   } else if (isSuggestion) {
     result.sort((a, b) =>
-      (voteCounts.get(b.id) || 0) - (voteCounts.get(a.id) || 0)
+      (voteCounts.get(b.id) || 0) -
+      (voteCounts.get(a.id) || 0)
     );
   }
 
@@ -525,7 +435,7 @@ function renderGames() {
   const sort = $('gameSort')?.value || 'newest';
 
   const approved = allSuggestions.filter(
-    suggestion => suggestion.status === 'approved'
+    item => item.status === 'approved'
   );
 
   const groups = {
@@ -554,7 +464,10 @@ function renderGames() {
 
   for (const category of categoryConfig) {
     const counter = $(`${category.id}TileCount`);
-    if (counter) counter.textContent = groups[category.id].length;
+
+    if (counter) {
+      counter.textContent = groups[category.id].length;
+    }
   }
 
   for (const [id, items] of Object.entries(groups)) {
@@ -612,7 +525,9 @@ async function refreshAuth() {
   admin = false;
 
   if (user) {
-    admin = check(await db.rpc('is_gamehub_admin')) === true;
+    admin = check(
+      await db.rpc('is_gamehub_admin')
+    ) === true;
   }
 
   const account = $('account');
@@ -646,6 +561,7 @@ async function refreshAuth() {
     };
 
     account.append(name, button);
+
   } else {
     const button = document.createElement('button');
     button.className = 'primary';
@@ -661,7 +577,7 @@ async function refreshAuth() {
   $('adminSection')?.classList.toggle('hidden', !admin);
 }
 
-// ABSTIMMEN
+// ABSTIMMUNGEN
 
 function setupVoteButtons() {
   document.querySelectorAll('[data-vote]').forEach(button => {
@@ -680,6 +596,7 @@ function setupVoteButtons() {
             .delete()
             .eq('suggestion_id', id)
             .eq('user_id', user.id));
+
         } else {
           check(await db.from('votes').insert({
             suggestion_id: id,
@@ -688,6 +605,7 @@ function setupVoteButtons() {
         }
 
         await load();
+
       } catch (error) {
         notice(error.message);
         button.disabled = false;
@@ -696,7 +614,7 @@ function setupVoteButtons() {
   });
 }
 
-// SPIELWECHSEL MIT RÜCKFRAGE
+// SPIELWECHSEL-DIALOG
 
 async function askPreviousGameStatus(previousGame) {
   return new Promise(resolve => {
@@ -708,14 +626,15 @@ async function askPreviousGameStatus(previousGame) {
            role="dialog"
            aria-modal="true"
            aria-labelledby="switchTitle">
+
         <h2 id="switchTitle">🎮 Spielwechsel</h2>
+
         <p>
           Du spielst gerade
           <strong>${esc(previousGame.title)}</strong>.
         </p>
-        <p>
-          Wohin soll dieses Spiel verschoben werden?
-        </p>
+
+        <p>Wohin soll dieses Spiel verschoben werden?</p>
 
         <select id="switchPreviousStatus">
           <option value="paused">⏸️ Pausiert</option>
@@ -725,72 +644,35 @@ async function askPreviousGameStatus(previousGame) {
         </select>
 
         <div class="game-switch-actions">
-          <button type="button" id="switchCancel" class="secondary">
+          <button type="button"
+                  id="switchCancel"
+                  class="secondary">
             Abbrechen
           </button>
-          <button type="button" id="switchConfirm" class="primary">
+
+          <button type="button"
+                  id="switchConfirm"
+                  class="primary">
             Spiel wechseln
           </button>
         </div>
       </div>
     `;
 
-    const style = document.createElement('style');
-
-    style.textContent = `
-      .game-switch-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-        display: grid;
-        place-items: center;
-        padding: 20px;
-        background: #05030bdb;
-      }
-
-      .game-switch-dialog {
-        width: min(100%, 430px);
-        padding: 25px;
-        background: #211831;
-        color: #f4f0ff;
-        border: 1px solid #a26bed;
-        border-radius: 20px;
-        box-shadow: 0 20px 80px #000b;
-      }
-
-      .game-switch-dialog h2 {
-        margin-top: 0;
-      }
-
-      .game-switch-dialog p {
-        color: #d2c5e2;
-        line-height: 1.5;
-      }
-
-      .game-switch-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 20px;
-      }
-    `;
-
-    document.head.appendChild(style);
     document.body.appendChild(overlay);
 
     const select = overlay.querySelector('#switchPreviousStatus');
-    const confirmButton = overlay.querySelector('#switchConfirm');
-    const cancelButton = overlay.querySelector('#switchCancel');
 
     function finish(value) {
       overlay.remove();
-      style.remove();
       resolve(value);
     }
 
-    cancelButton.onclick = () => finish(null);
-    confirmButton.onclick = () => finish(select.value);
+    overlay.querySelector('#switchCancel').onclick =
+      () => finish(null);
+
+    overlay.querySelector('#switchConfirm').onclick =
+      () => finish(select.value);
 
     overlay.addEventListener('keydown', event => {
       if (event.key === 'Escape') finish(null);
@@ -798,6 +680,47 @@ async function askPreviousGameStatus(previousGame) {
 
     select.focus();
   });
+}
+
+async function movePreviousGames(previousGames, previousStatus) {
+  const changed = [];
+
+  try {
+    for (const previous of previousGames) {
+      check(await db.from('games')
+        .update({ status: previousStatus })
+        .eq('id', previous.id));
+
+      changed.push(previous);
+    }
+
+    return changed;
+
+  } catch (error) {
+    for (const previous of changed) {
+      const result = await db.from('games')
+        .update({ status: 'playing' })
+        .eq('id', previous.id);
+
+      if (result.error) {
+        console.error('Wiederherstellung fehlgeschlagen:', result.error);
+      }
+    }
+
+    throw error;
+  }
+}
+
+async function restorePreviousGames(previousGames) {
+  for (const previous of previousGames) {
+    const result = await db.from('games')
+      .update({ status: 'playing' })
+      .eq('id', previous.id);
+
+    if (result.error) {
+      console.error('Wiederherstellung fehlgeschlagen:', result.error);
+    }
+  }
 }
 
 async function changeGameStatus(id, status) {
@@ -817,29 +740,26 @@ async function changeGameStatus(id, status) {
   }
 
   if (status === 'playing' && game.status !== 'playing') {
-    const currentGames = allGames.filter(
+    const previousGames = allGames.filter(
       item => item.status === 'playing' && item.id !== id
     );
 
     let previousStatus = 'paused';
 
-    if (currentGames.length) {
-      previousStatus = await askPreviousGameStatus(currentGames[0]);
+    if (previousGames.length) {
+      previousStatus = await askPreviousGameStatus(
+        previousGames[0]
+      );
 
       if (previousStatus === null) return false;
     }
 
-    const changedPrevious = [];
+    const changed = await movePreviousGames(
+      previousGames,
+      previousStatus
+    );
 
     try {
-      for (const previous of currentGames) {
-        check(await db.from('games')
-          .update({ status: previousStatus })
-          .eq('id', previous.id));
-
-        changedPrevious.push(previous);
-      }
-
       check(await db.from('games')
         .update({
           status: 'playing',
@@ -848,16 +768,7 @@ async function changeGameStatus(id, status) {
         .eq('id', id));
 
     } catch (error) {
-      for (const previous of changedPrevious) {
-        try {
-          await db.from('games')
-            .update({ status: 'playing' })
-            .eq('id', previous.id);
-        } catch (rollbackError) {
-          console.error('Wiederherstellung:', rollbackError);
-        }
-      }
-
+      await restorePreviousGames(changed);
       throw error;
     }
 
@@ -883,15 +794,27 @@ function setupAdmin() {
             <b>${esc(suggestion.title)}</b>
             <small>(${esc(suggestion.status)})</small>
           </span>
+
           <div>
             <button data-suggestion="${suggestion.id}"
-                    data-sstatus="approved">Freigeben</button>
+                    data-sstatus="approved">
+              Freigeben
+            </button>
+
             <button data-suggestion="${suggestion.id}"
-                    data-sstatus="rejected">Ablehnen</button>
+                    data-sstatus="rejected">
+              Ablehnen
+            </button>
+
             <button data-suggestion="${suggestion.id}"
-                    data-sstatus="pending">Zurückstellen</button>
+                    data-sstatus="pending">
+              Zurückstellen
+            </button>
+
             <button class="danger"
-                    data-sdelete="${suggestion.id}">Löschen</button>
+                    data-sdelete="${suggestion.id}">
+              Löschen
+            </button>
           </div>
         </div>
       `).join('')
@@ -904,19 +827,37 @@ function setupAdmin() {
             <b>${esc(game.title)}</b>
             <small>(${esc(statusLabel(game.status))})</small>
           </span>
+
           <div>
             <button data-game="${game.id}"
-                    data-gstatus="playing">🟢 Aktuell</button>
+                    data-gstatus="playing">
+              🟢 Aktuell
+            </button>
+
             <button data-game="${game.id}"
-                    data-gstatus="paused">⏸️ Pausiert</button>
+                    data-gstatus="paused">
+              ⏸️ Pausiert
+            </button>
+
             <button data-game="${game.id}"
-                    data-gstatus="planned">🚀 Geplant</button>
+                    data-gstatus="planned">
+              🚀 Geplant
+            </button>
+
             <button data-game="${game.id}"
-                    data-gstatus="played">✅ Gespielt</button>
+                    data-gstatus="played">
+              ✅ Gespielt
+            </button>
+
             <button data-game="${game.id}"
-                    data-gstatus="abandoned">❌ Abgebrochen</button>
+                    data-gstatus="abandoned">
+              ❌ Abgebrochen
+            </button>
+
             <button class="danger"
-                    data-gdelete="${game.id}">Löschen</button>
+                    data-gdelete="${game.id}">
+              Löschen
+            </button>
           </div>
         </div>
       `).join('')
@@ -966,8 +907,10 @@ function setupAdmin() {
           notice('Spielstatus aktualisiert! 💜');
           await load();
         }
+
       } catch (error) {
         notice(error.message);
+
       } finally {
         button.disabled = false;
       }
@@ -1037,7 +980,7 @@ async function load() {
   setupAdmin();
 }
 
-// FORMULAR: SPIELVORSCHLAG
+// SPIELVORSCHLAG EINREICHEN
 
 $('suggestForm')?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -1057,12 +1000,13 @@ $('suggestForm')?.addEventListener('submit', async event => {
     event.target.reset();
     notice('Dein Vorschlag wartet auf Freigabe! 💜');
     await load();
+
   } catch (error) {
     notice(error.message);
   }
 });
 
-// FORMULAR: ADMIN-SPIEL HINZUFÜGEN
+// NEUES ADMIN-SPIEL HINZUFÜGEN
 
 $('gameForm')?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -1093,17 +1037,12 @@ $('gameForm')?.addEventListener('submit', async event => {
       }
     }
 
-    const changedPrevious = [];
+    const changed = await movePreviousGames(
+      previousGames,
+      previousStatus
+    );
 
     try {
-      for (const previous of previousGames) {
-        check(await db.from('games')
-          .update({ status: previousStatus })
-          .eq('id', previous.id));
-
-        changedPrevious.push(previous);
-      }
-
       const newGame = {
         title,
         description,
@@ -1117,16 +1056,7 @@ $('gameForm')?.addEventListener('submit', async event => {
       check(await db.from('games').insert(newGame));
 
     } catch (error) {
-      for (const previous of changedPrevious) {
-        try {
-          await db.from('games')
-            .update({ status: 'playing' })
-            .eq('id', previous.id);
-        } catch (rollbackError) {
-          console.error(rollbackError);
-        }
-      }
-
+      await restorePreviousGames(changed);
       throw error;
     }
 
