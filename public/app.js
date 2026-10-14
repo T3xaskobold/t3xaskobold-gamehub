@@ -62,7 +62,7 @@ function statusLabel(status) {
   })[status] || status;
 }
 
-// IGDB-SUCHE BEIM EINGEBEN EINES SPIELNAMENS
+// AUTOMATISCHE IGDB-SPIELSUCHE
 
 function setupGameSearch(inputId) {
   const input = $(inputId);
@@ -109,7 +109,9 @@ function setupGameSearch(inputId) {
           { signal: controller.signal }
         );
 
-        if (!response.ok) throw new Error('Spielsuche fehlgeschlagen');
+        if (!response.ok) {
+          throw new Error('Spielsuche fehlgeschlagen');
+        }
 
         const data = await response.json();
         if (currentId !== requestId) return;
@@ -170,7 +172,7 @@ function setupGameSearch(inputId) {
   });
 }
 
-// GROSSE LILA KATEGORIE-KACHELN
+// VIER GROSSE LILA KATEGORIE-KACHELN
 
 function setupCategoryTiles() {
   const sections = [
@@ -251,7 +253,6 @@ function setupCategoryTiles() {
         button.classList.add('active');
         button.setAttribute('aria-expanded', 'true');
 
-        // Cover beim Öffnen sicher nachladen.
         loadGameCovers().catch(console.warn);
 
         content.scrollIntoView({
@@ -263,7 +264,7 @@ function setupCategoryTiles() {
   }
 }
 
-// SPIELEKARTEN MIT FESTEM COVERBEREICH
+// SPIELEKARTEN MIT COVER OBERHALB DES NAMENS
 
 function card(game, type) {
   const votes = voteCounts.get(game.id) || 0;
@@ -286,8 +287,8 @@ function card(game, type) {
           class="game-cover"
           data-cover-title="${esc(game.title)}"
           alt="Cover von ${esc(game.title)}"
-          loading="lazy"
-          hidden
+          loading="eager"
+          decoding="async"
         >
       </div>
 
@@ -314,13 +315,16 @@ function card(game, type) {
   `;
 }
 
-// IGDB-COVER AUTOMATISCH LADEN
+// IGDB-COVER ABRUFEN
 
 async function getGameCover(title) {
   const key = String(title || '').trim().toLowerCase();
 
   if (!key) return null;
-  if (coverCache.has(key)) return coverCache.get(key);
+
+  if (coverCache.has(key)) {
+    return coverCache.get(key);
+  }
 
   try {
     const response = await fetch(
@@ -339,15 +343,22 @@ async function getGameCover(title) {
         ? data.cover
         : null;
 
-    if (cover) coverCache.set(key, cover);
+    coverCache.set(key, cover);
 
     return cover;
 
   } catch (error) {
-    console.warn('Cover konnte nicht geladen werden:', title, error);
+    console.warn(
+      'Cover konnte nicht geladen werden:',
+      title,
+      error
+    );
+
     return null;
   }
 }
+
+// COVER ZUVERLÄSSIG IN SPIELEKARTEN ANZEIGEN
 
 async function loadGameCovers() {
   const images = [
@@ -355,46 +366,77 @@ async function loadGameCovers() {
   ];
 
   const titles = [
-    ...new Set(images.map(img => img.dataset.coverTitle))
+    ...new Set(
+      images
+        .map(img => img.dataset.coverTitle)
+        .filter(Boolean)
+    )
   ];
 
-  const results = await Promise.all(
-    titles.map(async title => [
-      title,
-      await getGameCover(title)
-    ])
-  );
+  // Cover in kleinen Gruppen abrufen.
+  // Das vermeidet zu viele gleichzeitige Anfragen.
+  const covers = new Map();
 
-  const covers = new Map(results);
+  for (let i = 0; i < titles.length; i += 5) {
+    const batch = titles.slice(i, i + 5);
+
+    const results = await Promise.all(
+      batch.map(async title => [
+        title,
+        await getGameCover(title)
+      ])
+    );
+
+    for (const [title, cover] of results) {
+      covers.set(title, cover);
+    }
+  }
 
   for (const img of images) {
     if (!img.isConnected) continue;
 
-    const cover = covers.get(img.dataset.coverTitle);
+    const title = img.dataset.coverTitle;
+    const cover = covers.get(title);
     const wrap = img.closest('.game-cover-wrap');
 
-    if (!cover) continue;
+    if (!cover) {
+      img.removeAttribute('src');
+      img.style.display = 'none';
+      wrap?.classList.remove('has-cover');
+      continue;
+    }
 
-    img.onload = () => {
+    // Wichtig:
+    // Das Bild wird nicht mehr mit "hidden" blockiert.
+    // Es wird zunächst unsichtbar vorgeladen.
+    img.style.display = 'block';
+    img.style.opacity = '0';
+    img.loading = 'eager';
+
+    const showCover = () => {
       if (!img.isConnected) return;
 
-      img.hidden = false;
       img.style.display = 'block';
-
+      img.style.opacity = '1';
       wrap?.classList.add('has-cover');
     };
 
-    img.onerror = () => {
-      img.hidden = true;
-      img.style.display = 'none';
+    const showFallback = () => {
+      if (!img.isConnected) return;
 
+      img.style.display = 'none';
       wrap?.classList.remove('has-cover');
     };
 
-    img.src = cover;
+    img.onload = showCover;
+    img.onerror = showFallback;
 
-    if (img.complete && img.naturalWidth > 0) {
-      img.onload();
+    if (img.getAttribute('src') !== cover) {
+      img.src = cover;
+    } else if (img.complete && img.naturalWidth > 0) {
+      showCover();
+    } else if (img.complete && img.naturalWidth === 0) {
+      showFallback();
     }
   }
 }
@@ -703,7 +745,10 @@ async function movePreviousGames(previousGames, previousStatus) {
         .eq('id', previous.id);
 
       if (result.error) {
-        console.error('Wiederherstellung fehlgeschlagen:', result.error);
+        console.error(
+          'Wiederherstellung fehlgeschlagen:',
+          result.error
+        );
       }
     }
 
@@ -718,7 +763,10 @@ async function restorePreviousGames(previousGames) {
       .eq('id', previous.id);
 
     if (result.error) {
-      console.error('Wiederherstellung fehlgeschlagen:', result.error);
+      console.error(
+        'Wiederherstellung fehlgeschlagen:',
+        result.error
+      );
     }
   }
 }
@@ -1006,7 +1054,7 @@ $('suggestForm')?.addEventListener('submit', async event => {
   }
 });
 
-// NEUES ADMIN-SPIEL HINZUFÜGEN
+// ADMIN: NEUES SPIEL HINZUFÜGEN
 
 $('gameForm')?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -1073,6 +1121,12 @@ $('gameForm')?.addEventListener('submit', async event => {
 
 (async () => {
   setupCategoryTiles();
+
+  // Vorschlagsliste immer aufklappen
+  const suggestedSection = $('suggestedSection');
+  if (suggestedSection?.tagName === 'DETAILS') {
+    suggestedSection.open = true;
+  }
 
   setupGameSearch('title');
   setupGameSearch('gameTitle');
