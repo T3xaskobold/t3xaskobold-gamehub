@@ -208,6 +208,10 @@
       line-height: 1.6;
     }
 
+    .stream-info p {
+      margin: 12px 0;
+    }
+
     @media (min-width: 950px) {
       .stream-layout {
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
@@ -319,12 +323,25 @@
 
       </div>
 
+      <!-- PERSÖNLICHER SUPPORT-TEXT -->
+
       <div class="stream-info">
-        💜 <strong>Deine Unterstützung zählt!</strong>
-        Follows, Abos und Spenden laufen weiterhin über
-        Twitch beziehungsweise Streamlabs. Wenn deine
-        Alerts dort eingerichtet sind, können sie wie
-        gewohnt in OBS erscheinen.
+        💜 <strong>Danke für deinen Support!</strong>
+
+        <p>
+          Du feierst meine Streams und möchtest mich
+          unterstützen? Darüber freue ich mich riesig! 🥰
+        </p>
+
+        <p>
+          Egal ob Follow, Abo oder kleine Spende:
+          Jede Unterstützung bedeutet mir viel und hilft
+          mir, den Stream weiterzuentwickeln.
+        </p>
+
+        <strong>
+          Danke, dass du Teil der Kobold-Community bist! 👾💜
+        </strong>
       </div>
 
     </section>
@@ -529,7 +546,7 @@
             <span id="abandonedCount"
                   class="category-count">0</span>
           <span class="category-arrow">⌄</span>
-          </span>
+        </span>
         </summary>
         <div class="category-content">
           <div id="abandoned" class="grid"></div>
@@ -603,8 +620,6 @@
       const chatContainer = document.getElementById("twitchChatContainer");
 
       const channel = "t3xaskobold";
-
-      // Twitch benötigt die tatsächliche Domain der Seite.
       const parent = window.location.hostname;
 
       function makeIframe(src, title, allow) {
@@ -665,8 +680,6 @@
         if (livestream) {
           loadStream();
         } else {
-          // Player entfernen, damit die Wiedergabe
-          // beim Verlassen der Stream-Seite stoppt.
           playerContainer.replaceChildren();
           chatContainer.replaceChildren();
         }
