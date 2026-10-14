@@ -264,7 +264,7 @@ function setupCategoryTiles() {
   }
 }
 
-// SPIELEKARTEN MIT COVER OBERHALB DES NAMENS
+// SPIELEKARTEN
 
 function card(game, type) {
   const votes = voteCounts.get(game.id) || 0;
@@ -315,7 +315,7 @@ function card(game, type) {
   `;
 }
 
-// IGDB-COVER ABRUFEN
+// IGDB-COVER
 
 async function getGameCover(title) {
   const key = String(title || '').trim().toLowerCase();
@@ -358,8 +358,6 @@ async function getGameCover(title) {
   }
 }
 
-// COVER ZUVERLÄSSIG IN SPIELEKARTEN ANZEIGEN
-
 async function loadGameCovers() {
   const images = [
     ...document.querySelectorAll('img[data-cover-title]')
@@ -373,8 +371,6 @@ async function loadGameCovers() {
     )
   ];
 
-  // Cover in kleinen Gruppen abrufen.
-  // Das vermeidet zu viele gleichzeitige Anfragen.
   const covers = new Map();
 
   for (let i = 0; i < titles.length; i += 5) {
@@ -406,9 +402,6 @@ async function loadGameCovers() {
       continue;
     }
 
-    // Wichtig:
-    // Das Bild wird nicht mehr mit "hidden" blockiert.
-    // Es wird zunächst unsichtbar vorgeladen.
     img.style.display = 'block';
     img.style.opacity = '0';
     img.loading = 'eager';
@@ -542,6 +535,163 @@ function renderGames() {
   loadGameCovers().catch(console.warn);
 }
 
+// NEU: GAMEHUB-STATISTIKEN
+
+function renderStatistics() {
+  const statuses = [
+    { key: 'playing', label: 'Aktuell', icon: '🟢', color: '#45c78c' },
+    { key: 'planned', label: 'Geplant', icon: '🚀', color: '#9d70ff' },
+    { key: 'paused', label: 'Pausiert', icon: '⏸️', color: '#e7ae56' },
+    { key: 'played', label: 'Gespielt', icon: '✅', color: '#56b5ed' },
+    { key: 'abandoned', label: 'Abgebrochen', icon: '❌', color: '#e16c91' }
+  ];
+
+  const counts = {};
+
+  for (const item of statuses) {
+    counts[item.key] = allGames.filter(
+      game => game.status === item.key
+    ).length;
+  }
+
+  const approved = allSuggestions.filter(
+    suggestion => suggestion.status === 'approved'
+  );
+
+  const totalVotes = approved.reduce(
+    (sum, suggestion) =>
+      sum + (voteCounts.get(suggestion.id) || 0),
+    0
+  );
+
+  const numbers = {
+    statTotalGames: allGames.length,
+    statPlaying: counts.playing,
+    statPlayed: counts.played,
+    statPlanned: counts.planned,
+    statPaused: counts.paused,
+    statAbandoned: counts.abandoned,
+    statSuggestions: approved.length,
+    statVotes: totalVotes
+  };
+
+  for (const [id, value] of Object.entries(numbers)) {
+    const element = $(id);
+    if (element) {
+      element.textContent = value.toLocaleString('de-DE');
+    }
+  }
+
+  const chart = $('statisticsChart');
+
+  if (chart) {
+    const max = Math.max(1, ...Object.values(counts));
+
+    chart.innerHTML = `
+      <div style="display:grid;gap:18px;padding:8px 0">
+        ${statuses.map(item => {
+          const count = counts[item.key];
+          const width = count === 0
+            ? 0
+            : Math.max(3, (count / max) * 100);
+
+          return `
+            <div>
+              <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:10px;
+                margin-bottom:8px;
+              ">
+                <span>${item.icon} ${item.label}</span>
+                <strong>${count}</strong>
+              </div>
+
+              <div style="
+                height:15px;
+                overflow:hidden;
+                border-radius:20px;
+                background:rgba(255,255,255,.1);
+              ">
+                <div style="
+                  height:100%;
+                  width:${width}%;
+                  border-radius:20px;
+                  background:${item.color};
+                  transition:width .4s ease;
+                "></div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  const topFive = $('statisticsTopFive');
+
+  if (topFive) {
+    const sorted = [...approved].sort((a, b) => {
+      const difference =
+        (voteCounts.get(b.id) || 0) -
+        (voteCounts.get(a.id) || 0);
+
+      return difference ||
+        a.title.localeCompare(b.title, 'de');
+    });
+
+    const top = sorted.slice(0, 5);
+
+    if (!top.length) {
+      topFive.innerHTML = empty(
+        'Noch keine freigegebenen Spielwünsche vorhanden. 💜'
+      );
+    } else {
+      topFive.innerHTML = `
+        <div style="display:grid;gap:12px">
+          ${top.map((suggestion, index) => {
+            const votes = voteCounts.get(suggestion.id) || 0;
+
+            const medal = ['🥇', '🥈', '🥉', '🏅', '🏅'][index];
+
+            return `
+              <div style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                padding:14px;
+                border:1px solid rgba(179,109,255,.25);
+                border-radius:13px;
+                background:rgba(157,88,231,.1);
+              ">
+                <span style="
+                  font-size:1.5rem;
+                  flex:0 0 32px;
+                  text-align:center;
+                ">${medal}</span>
+
+                <strong style="
+                  flex:1;
+                  min-width:0;
+                  overflow-wrap:anywhere;
+                ">${esc(suggestion.title)}</strong>
+
+                <span style="
+                  flex:0 0 auto;
+                  color:#d6a8ff;
+                  font-weight:700;
+                  white-space:nowrap;
+                ">💜 ${votes}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+  }
+}
+
 // TWITCH-LOGIN
 
 async function login() {
@@ -573,6 +723,8 @@ async function refreshAuth() {
   }
 
   const account = $('account');
+  if (!account) return;
+
   account.replaceChildren();
 
   if (user) {
@@ -1025,6 +1177,10 @@ async function load() {
   }
 
   renderGames();
+
+  // NEU: Statistiken bei jedem Laden aktualisieren.
+  renderStatistics();
+
   setupAdmin();
 }
 
@@ -1122,7 +1278,6 @@ $('gameForm')?.addEventListener('submit', async event => {
 (async () => {
   setupCategoryTiles();
 
-  // Vorschlagsliste immer aufklappen
   const suggestedSection = $('suggestedSection');
   if (suggestedSection?.tagName === 'DETAILS') {
     suggestedSection.open = true;
