@@ -65,14 +65,15 @@ export default async function handler(req, res) {
       throw new Error('Kein Twitch-Token erhalten');
     }
 
+    // Spielnamen für IGDB sicher bereinigen
     const query = search || title;
 
-    // Sonderzeichen für die IGDB-Suche bereinigen
     const safeQuery = query
       .replace(/["\\]/g, ' ')
-      .replace(/[;\r\n]/g, ' ');
+      .replace(/[;\r\n]/g, ' ')
+      .trim();
 
-    // Spiele bei IGDB suchen
+    // IGDB nach passenden Spielen fragen
     const gameResponse = await fetch(
       'https://api.igdb.com/v4/games',
       {
@@ -85,7 +86,7 @@ export default async function handler(req, res) {
         body: `
           search "${safeQuery}";
           fields name,cover.image_id;
-          limit 30;
+          limit 50;
         `
       }
     );
@@ -103,31 +104,85 @@ export default async function handler(req, res) {
 
     const games = await gameResponse.json();
 
-    // Passende Cover-URL erzeugen
-    const coverUrl = game =>
-      game.cover?.image_id
-        ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.image_id}.jpg`
-        : null;
+    // Aus IGDB-Bild-ID eine Cover-Adresse erzeugen
+    function coverUrl(game) {
+      const imageId = game.cover?.image_id;
+
+      if (!imageId) return null;
+
+      return (
+        'https://images.igdb.com/igdb/image/upload/' +
+        `t_cover_big/${imageId}.jpg`
+      );
+    }
+
+    // Namen vereinheitlichen, damit unterschiedliche
+    // Schreibweisen besser verglichen werden können
+    function normalize(value) {
+      return String(value || '')
+        .normalize('NFKD')
+        .toLocaleLowerCase('de')
+        .replace(/&/g, 'and')
+        .replace(/[™®©]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+        .replace(/\s+/g, ' ');
+    }
+
+    // Übereinstimmung bewerten.
+    // Ein völlig anderes Spiel darf kein Cover liefern.
+    function matchScore(gameName, requestedTitle) {
+      const game = normalize(gameName);
+      const requested = normalize(requestedTitle);
+
+      if (!game || !requested) return -1;
+
+      // Exakter Titel
+      if (game === requested) return 1000;
+
+      // Beispielsweise "Skyrim" und
+      // "The Elder Scrolls V: Skyrim"
+      const gameWords = game.split(' ');
+      const requestedWords = requested.split(' ');
+
+      const requestedContained = requestedWords.every(
+        word => gameWords.includes(word)
+      );
+
+      const gameContained = gameWords.every(
+        word => requestedWords.includes(word)
+      );
+
+      if (requestedContained) {
+        return 500 -
+          Math.max(0, gameWords.length - requestedWords.length) * 5;
+      }
+
+      if (gameContained) {
+        return 350 -
+          Math.max(0, requestedWords.length - gameWords.length) * 5;
+      }
+
+      return -1;
+    }
 
     res.setHeader(
       'Cache-Control',
-      's-maxage=3600, stale-while-revalidate=86400'
+      's-maxage=300, stale-while-revalidate=3600'
     );
 
-    // NEU: Suchvorschläge für die Eingabefelder
+    // AUTOMATISCHE SUCHVORSCHLÄGE BLEIBEN ERHALTEN
     if (search) {
-      const normalized = search.toLocaleLowerCase();
+      const normalizedSearch = normalize(search);
 
       const suggestions = games
         .filter(game => game.name)
         .sort((a, b) => {
-          const aStarts = a.name
-            .toLocaleLowerCase()
-            .startsWith(normalized);
+          const aStarts = normalize(a.name)
+            .startsWith(normalizedSearch);
 
-          const bStarts = b.name
-            .toLocaleLowerCase()
-            .startsWith(normalized);
+          const bStarts = normalize(b.name)
+            .startsWith(normalizedSearch);
 
           return Number(bStarts) - Number(aStarts);
         })
@@ -143,18 +198,21 @@ export default async function handler(req, res) {
       });
     }
 
-    // BISHER: Cover für eine vorhandene Spielekarte
-    const normalizedTitle = title.toLocaleLowerCase();
+    // COVER FÜR VORHANDENE SPIELEKARTEN
+    // Nur passende Spiele berücksichtigen
+    const matches = games
+      .filter(game => game.name && game.cover?.image_id)
+      .map(game => ({
+        game,
+        score: matchScore(game.name, title)
+      }))
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score);
 
-    const match =
-      games.find(game =>
-        game.name?.toLocaleLowerCase() === normalizedTitle &&
-        game.cover?.image_id
-      ) ||
-      games.find(game => game.cover?.image_id);
+    const bestMatch = matches[0]?.game || null;
 
     return res.status(200).json({
-      cover: match ? coverUrl(match) : null
+      cover: bestMatch ? coverUrl(bestMatch) : null
     });
 
   } catch (error) {
