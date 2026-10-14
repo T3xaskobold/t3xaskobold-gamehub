@@ -78,280 +78,606 @@
     .app-install-help p {
       margin: 0 0 8px;
     }
+
+    /* LIVESTREAM-NAVIGATION */
+
+    .stream-nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 15px;
+      border: 1px solid rgba(179,109,255,.65);
+      border-radius: 12px;
+      background: #6924ad;
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .stream-nav-button:hover {
+      background: #8436d3;
+    }
+
+    .stream-nav-button:focus-visible,
+    .stream-action:focus-visible {
+      outline: 3px solid #d4a5ff;
+      outline-offset: 3px;
+    }
+
+    /* STREAM-SEITE */
+
+    .stream-page[hidden],
+    .gamehub-page[hidden] {
+      display: none !important;
+    }
+
+    .stream-page {
+      padding: 20px 0 36px;
+    }
+
+    .stream-page-heading {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .stream-page-heading h1 {
+      margin: 10px 0;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+    }
+
+    .stream-page-heading p {
+      opacity: .85;
+      line-height: 1.6;
+    }
+
+    .stream-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .stream-box {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(179,109,255,.4);
+      border-radius: 18px;
+      background: #171123;
+    }
+
+    .stream-box h2 {
+      margin: 0;
+      padding: 14px 16px;
+      font-size: 1.1rem;
+    }
+
+    .stream-player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #09070e;
+    }
+
+    .stream-player iframe,
+    .stream-chat iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .stream-chat {
+      height: 550px;
+      background: #111018;
+    }
+
+    .stream-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .stream-action {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 52px;
+      padding: 12px;
+      border-radius: 13px;
+      background: #6924ad;
+      color: #fff;
+      text-align: center;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .stream-action.donate {
+      background: #267d60;
+    }
+
+    .stream-action.secondary {
+      background: #302343;
+      border: 1px solid rgba(179,109,255,.5);
+    }
+
+    .stream-info {
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(157,88,231,.1);
+      border: 1px solid rgba(179,109,255,.25);
+      line-height: 1.6;
+    }
+
+    @media (min-width: 950px) {
+      .stream-layout {
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+      }
+
+      .stream-chat {
+        height: 100%;
+        min-height: 460px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stream-actions {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <a class="brand" href="./">
+    <a class="brand" href="#gamehub" id="brandHome">
       🎮 <strong>T3xaskobold</strong>
       <span>GAMEHUB</span>
     </a>
 
     <nav>
+      <a class="stream-nav-button"
+         href="#livestream"
+         id="streamNavButton">
+        🔴 Livestream
+      </a>
+
       <a href="https://www.twitch.tv/t3xaskobold"
          target="_blank"
          rel="noopener">💜 Twitch</a>
+
       <div id="account">Lade…</div>
     </nav>
   </header>
 
   <main>
 
-    <!-- APP INSTALLIEREN -->
+    <!-- LIVESTREAM-SEITE -->
 
-    <section id="appInstallBanner"
-             class="app-install-banner"
+    <section id="livestreamPage"
+             class="stream-page"
+             aria-label="T3xaskobold Livestream"
              hidden>
 
-      <img
-        class="app-install-icon"
-        src="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png"
-        alt="T3xaskobold-Kobold"
-      >
+      <div class="stream-page-heading">
+        <span class="eyebrow">🔴 T3XASKOBOLD LIVE</span>
 
-      <div class="app-install-text">
-        <strong>👾 GameHub immer dabei!</strong>
+        <h1>Willkommen im Livestream! 💜</h1>
+
         <p>
-          Installiere die kostenlose GameHub-App
-          mit unserem lila Kobold! 💜
+          Schau direkt hier zu, chatte mit der Community
+          und unterstütze den Stream!
         </p>
       </div>
 
-      <button id="appInstallButton"
-              class="app-install-button"
-              type="button"
-              aria-controls="appInstallHelp"
-              aria-expanded="false">
-        📲 App installieren
-      </button>
+      <div class="stream-layout">
 
-      <div id="appInstallHelp"
-           class="app-install-help"
-           hidden
-           aria-live="polite"></div>
+        <div class="stream-box">
+          <h2>🎥 Twitch-Livestream</h2>
+
+          <div class="stream-player" id="twitchPlayerContainer">
+            <!-- Twitch-Player wird beim Öffnen geladen -->
+          </div>
+        </div>
+
+        <div class="stream-box">
+          <h2>💬 Live-Chat</h2>
+
+          <div class="stream-chat" id="twitchChatContainer">
+            <!-- Twitch-Chat wird beim Öffnen geladen -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="stream-actions">
+
+        <a class="stream-action"
+           href="https://www.twitch.tv/t3xaskobold"
+           target="_blank"
+           rel="noopener noreferrer">
+          💜 Auf Twitch folgen
+        </a>
+
+        <a class="stream-action donate"
+           href="https://streamlabs.com/t3xaskobold2/tip"
+           target="_blank"
+           rel="noopener noreferrer">
+          💸 Stream unterstützen
+        </a>
+
+        <a class="stream-action secondary"
+           href="https://www.twitch.tv/subs/t3xaskobold"
+           target="_blank"
+           rel="noopener noreferrer">
+          ⭐ Kanal abonnieren
+        </a>
+
+        <a class="stream-action secondary"
+           href="#gamehub">
+          🎮 Zum GameHub
+        </a>
+
+      </div>
+
+      <div class="stream-info">
+        💜 <strong>Deine Unterstützung zählt!</strong>
+        Follows, Abos und Spenden laufen weiterhin über
+        Twitch beziehungsweise Streamlabs. Wenn deine
+        Alerts dort eingerichtet sind, können sie wie
+        gewohnt in OBS erscheinen.
+      </div>
+
     </section>
 
-    <!-- KOMPAKTER STARTBEREICH -->
+    <!-- BISHERIGER GAMEHUB -->
 
-    <section class="hero">
-      <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
-      <h1>
-        Deine Ideen.<br>
-        <em>Unsere Abenteuer.</em>
-      </h1>
-      <p>
-        Entdecke unsere Games, stimme für Spielwünsche
-        ab und sieh, was gerade im Stream läuft.
-      </p>
-      <a class="primary" href="#vorschlagen">
-        🎯 Spiel vorschlagen
-      </a>
-    </section>
+    <div id="gamehubPage" class="gamehub-page">
 
-    <!-- STATISTIKEN -->
+      <!-- APP INSTALLIEREN -->
 
-    <section class="stats">
-      <div>
-        <b id="playedCount">0</b>
-        <small>Gespielt</small>
-      </div>
-      <div>
-        <b id="plannedCount">0</b>
-        <small>Geplant</small>
-      </div>
-      <div>
-        <b id="suggestedCount">0</b>
-        <small>Vorschläge</small>
-      </div>
-    </section>
+      <section id="appInstallBanner"
+               class="app-install-banner"
+               hidden>
 
-    <!-- 1. SPIELVORSCHLÄGE -->
+        <img
+          class="app-install-icon"
+          src="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png"
+          alt="T3xaskobold-Kobold"
+        >
 
-    <section id="vorschlagen" class="panel">
-      <span class="eyebrow">DEINE STIMME ZÄHLT</span>
-      <h2>💡 Spiel vorschlagen</h2>
-      <p>
-        Melde dich mit Twitch an und schlage ein Spiel vor.
-        Vorschläge erscheinen nach der Freigabe.
-      </p>
+        <div class="app-install-text">
+          <strong>👾 GameHub immer dabei!</strong>
+          <p>
+            Installiere die kostenlose GameHub-App
+            mit unserem lila Kobold! 💜
+          </p>
+        </div>
 
-      <form id="suggestForm">
-        <label for="title">Spielname</label>
-        <input id="title"
-               maxlength="100"
-               minlength="2"
-               required
-               placeholder="Welches Spiel sollen wir zocken?">
-
-        <label for="description">
-          Warum dieses Spiel? (optional)
-        </label>
-        <textarea id="description"
-                  maxlength="500"
-                  rows="3"
-                  placeholder="Deine Idee ..."></textarea>
-
-        <button class="primary" type="submit">
-          Vorschlag einreichen ↗
+        <button id="appInstallButton"
+                class="app-install-button"
+                type="button"
+                aria-controls="appInstallHelp"
+                aria-expanded="false">
+          📲 App installieren
         </button>
-      </form>
-    </section>
 
-    <details class="game-category" id="suggestedSection">
-      <summary>
-        <span>🏆 Eure Spielwünsche</span>
-        <span class="category-right">
-          <span id="suggestedCategoryCount"
-                class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
-      </summary>
-      <div class="category-content">
-        <p>Ein Twitch-Account, eine Stimme pro Vorschlag.</p>
-        <div id="suggested" class="grid"></div>
-      </div>
-    </details>
+        <div id="appInstallHelp"
+             class="app-install-help"
+             hidden
+             aria-live="polite"></div>
+      </section>
 
-    <!-- 2. AKTUELL GESPIELT -->
+      <!-- KOMPAKTER STARTBEREICH -->
 
-    <section class="current-game-section">
-      <div class="sectionHeading">
-        <h2>🟢 Aktuell gespielt</h2>
-      </div>
-      <div id="playing" class="grid"></div>
-    </section>
+      <section class="hero">
+        <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
+        <h1>
+          Deine Ideen.<br>
+          <em>Unsere Abenteuer.</em>
+        </h1>
+        <p>
+          Entdecke unsere Games, stimme für Spielwünsche
+          ab und sieh, was gerade im Stream läuft.
+        </p>
+        <a class="primary" href="#vorschlagen">
+          🎯 Spiel vorschlagen
+        </a>
+      </section>
 
-    <!-- SUCHE UND SORTIERUNG -->
+      <!-- STATISTIKEN -->
 
-    <section class="game-filters" aria-label="Spiele suchen und sortieren">
-      <label for="gameFilter">🔎 Spiele suchen</label>
-      <input id="gameFilter"
-             type="search"
-             placeholder="Spielname eingeben ...">
+      <section class="stats">
+        <div>
+          <b id="playedCount">0</b>
+          <small>Gespielt</small>
+        </div>
+        <div>
+          <b id="plannedCount">0</b>
+          <small>Geplant</small>
+        </div>
+        <div>
+          <b id="suggestedCount">0</b>
+          <small>Vorschläge</small>
+        </div>
+      </section>
 
-      <label for="gameSort">Sortieren nach</label>
-      <select id="gameSort">
-        <option value="alphabetical">🔤 Alphabetisch (A–Z)</option>
-        <option value="newest">🆕 Zuletzt hinzugefügt</option>
-        <option value="lastPlayed">🎮 Zuletzt gespielt</option>
-      </select>
-    </section>
+      <!-- 1. SPIELVORSCHLÄGE -->
 
-    <!-- 3. PAUSIERT -->
+      <section id="vorschlagen" class="panel">
+        <span class="eyebrow">DEINE STIMME ZÄHLT</span>
+        <h2>💡 Spiel vorschlagen</h2>
+        <p>
+          Melde dich mit Twitch an und schlage ein Spiel vor.
+          Vorschläge erscheinen nach der Freigabe.
+        </p>
 
-    <details class="game-category" id="pausedSection">
-      <summary>
-        <span>⏸️ Pausiert</span>
-        <span class="category-right">
-          <span id="pausedCount" class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
-      </summary>
-      <div class="category-content">
-        <div id="paused" class="grid"></div>
-      </div>
-    </details>
+        <form id="suggestForm">
+          <label for="title">Spielname</label>
+          <input id="title"
+                 maxlength="100"
+                 minlength="2"
+                 required
+                 placeholder="Welches Spiel sollen wir zocken?">
 
-    <!-- 4. GEPLANT -->
+          <label for="description">
+            Warum dieses Spiel? (optional)
+          </label>
+          <textarea id="description"
+                    maxlength="500"
+                    rows="3"
+                    placeholder="Deine Idee ..."></textarea>
 
-    <details class="game-category" id="plannedSection">
-      <summary>
-        <span>🚀 Geplant</span>
-        <span class="category-right">
-          <span id="plannedCategoryCount"
-                class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
-      </summary>
-      <div class="category-content">
-        <div id="planned" class="grid"></div>
-      </div>
-    </details>
+          <button class="primary" type="submit">
+            Vorschlag einreichen ↗
+          </button>
+        </form>
+      </section>
 
-    <!-- 5. GESPIELT -->
+      <details class="game-category" id="suggestedSection">
+        <summary>
+          <span>🏆 Eure Spielwünsche</span>
+          <span class="category-right">
+            <span id="suggestedCategoryCount"
+                  class="category-count">0</span>
+            <span class="category-arrow">⌄</span>
+          </span>
+        </summary>
+        <div class="category-content">
+          <p>Ein Twitch-Account, eine Stimme pro Vorschlag.</p>
+          <div id="suggested" class="grid"></div>
+        </div>
+      </details>
 
-    <details class="game-category" id="playedSection">
-      <summary>
-        <span>✅ Gespielt</span>
-        <span class="category-right">
-          <span id="playedCategoryCount"
-                class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
-      </summary>
-      <div class="category-content">
-        <div id="played" class="grid"></div>
-      </div>
-    </details>
+      <!-- 2. AKTUELL GESPIELT -->
 
-    <!-- 6. ABGEBROCHEN -->
+      <section class="current-game-section">
+        <div class="sectionHeading">
+          <h2>🟢 Aktuell gespielt</h2>
+        </div>
+        <div id="playing" class="grid"></div>
+      </section>
 
-    <details class="game-category" id="abandonedSection">
-      <summary>
-        <span>❌ Abgebrochen</span>
-        <span class="category-right">
-          <span id="abandonedCount"
-                class="category-count">0</span>
-          <span class="category-arrow">⌄</span>
-        </span>
-      </summary>
-      <div class="category-content">
-        <div id="abandoned" class="grid"></div>
-      </div>
-    </details>
+      <!-- SUCHE UND SORTIERUNG -->
 
-    <!-- ADMIN -->
+      <section class="game-filters" aria-label="Spiele suchen und sortieren">
+        <label for="gameFilter">🔎 Spiele suchen</label>
+        <input id="gameFilter"
+               type="search"
+               placeholder="Spielname eingeben ...">
 
-    <section id="adminSection" class="panel hidden">
-      <span class="eyebrow">NUR FÜR DEN KANALINHABER</span>
-      <h2>🛡️ Admin-Bereich</h2>
-
-      <h3>Neues Spiel</h3>
-      <form id="gameForm">
-        <label for="gameTitle">Spielname</label>
-        <input id="gameTitle" required maxlength="150">
-
-        <label for="gameDescription">
-          Beschreibung (optional)
-        </label>
-        <textarea id="gameDescription"
-                  maxlength="2000"></textarea>
-
-        <label for="gameStatus">Status</label>
-        <select id="gameStatus">
-          <option value="planned">🚀 Geplant</option>
-          <option value="playing">🟢 Aktuell gespielt</option>
-          <option value="paused">⏸️ Pausiert</option>
-          <option value="played">✅ Gespielt</option>
-          <option value="abandoned">❌ Abgebrochen</option>
+        <label for="gameSort">Sortieren nach</label>
+        <select id="gameSort">
+          <option value="alphabetical">🔤 Alphabetisch (A–Z)</option>
+          <option value="newest">🆕 Zuletzt hinzugefügt</option>
+          <option value="lastPlayed">🎮 Zuletzt gespielt</option>
         </select>
+      </section>
 
-        <button type="submit" class="primary">
-          Spiel hinzufügen
-        </button>
-      </form>
+      <!-- 3. PAUSIERT -->
 
-      <h3>Vorschläge verwalten</h3>
-      <div id="adminSuggestions"></div>
+      <details class="game-category" id="pausedSection">
+        <summary>
+          <span>⏸️ Pausiert</span>
+          <span class="category-right">
+            <span id="pausedCount" class="category-count">0</span>
+            <span class="category-arrow">⌄</span>
+          </span>
+        </summary>
+        <div class="category-content">
+          <div id="paused" class="grid"></div>
+        </div>
+      </details>
 
-      <h3>Spiele verwalten</h3>
-      <div id="adminGames"></div>
-    </section>
+      <!-- 4. GEPLANT -->
+
+      <details class="game-category" id="plannedSection">
+        <summary>
+          <span>🚀 Geplant</span>
+          <span class="category-right">
+            <span id="plannedCategoryCount"
+                  class="category-count">0</span>
+            <span class="category-arrow">⌄</span>
+          </span>
+        </summary>
+        <div class="category-content">
+          <div id="planned" class="grid"></div>
+        </div>
+      </details>
+
+      <!-- 5. GESPIELT -->
+
+      <details class="game-category" id="playedSection">
+        <summary>
+          <span>✅ Gespielt</span>
+          <span class="category-right">
+            <span id="playedCategoryCount"
+                  class="category-count">0</span>
+            <span class="category-arrow">⌄</span>
+          </span>
+        </summary>
+        <div class="category-content">
+          <div id="played" class="grid"></div>
+        </div>
+      </details>
+
+      <!-- 6. ABGEBROCHEN -->
+
+      <details class="game-category" id="abandonedSection">
+        <summary>
+          <span>❌ Abgebrochen</span>
+          <span class="category-right">
+            <span id="abandonedCount"
+                  class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+          </span>
+        </summary>
+        <div class="category-content">
+          <div id="abandoned" class="grid"></div>
+        </div>
+      </details>
+
+      <!-- ADMIN -->
+
+      <section id="adminSection" class="panel hidden">
+        <span class="eyebrow">NUR FÜR DEN KANALINHABER</span>
+        <h2>🛡️ Admin-Bereich</h2>
+
+        <h3>Neues Spiel</h3>
+        <form id="gameForm">
+          <label for="gameTitle">Spielname</label>
+          <input id="gameTitle" required maxlength="150">
+
+          <label for="gameDescription">
+            Beschreibung (optional)
+          </label>
+          <textarea id="gameDescription"
+                    maxlength="2000"></textarea>
+
+          <label for="gameStatus">Status</label>
+          <select id="gameStatus">
+            <option value="planned">🚀 Geplant</option>
+            <option value="playing">🟢 Aktuell gespielt</option>
+            <option value="paused">⏸️ Pausiert</option>
+            <option value="played">✅ Gespielt</option>
+            <option value="abandoned">❌ Abgebrochen</option>
+          </select>
+
+          <button type="submit" class="primary">
+            Spiel hinzufügen
+          </button>
+        </form>
+
+        <h3>Vorschläge verwalten</h3>
+        <div id="adminSuggestions"></div>
+
+        <h3>Spiele verwalten</h3>
+        <div id="adminGames"></div>
+      </section>
+
+    </div>
 
     <div id="notice"
          role="status"
          aria-live="polite"></div>
+
   </main>
 
   <footer>
     Made for 💜 T3xaskobold ·
-    <a href="https://www.twitch.tv/t3xaskobold">
+    <a href="https://www.twitch.tv/t3xaskobold"
+       target="_blank"
+       rel="noopener noreferrer">
       Twitch-Kanal
     </a>
   </footer>
 
   <script type="module" src="./app.js"></script>
+
+  <!-- LIVESTREAM-NAVIGATION UND TWITCH-EINBINDUNG -->
+
+  <script>
+    (function () {
+      const streamPage = document.getElementById("livestreamPage");
+      const gamehubPage = document.getElementById("gamehubPage");
+      const playerContainer = document.getElementById("twitchPlayerContainer");
+      const chatContainer = document.getElementById("twitchChatContainer");
+
+      const channel = "t3xaskobold";
+
+      // Twitch benötigt die tatsächliche Domain der Seite.
+      const parent = window.location.hostname;
+
+      function makeIframe(src, title, allow) {
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.title = title;
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+        if (allow) {
+          iframe.setAttribute("allow", allow);
+        }
+
+        return iframe;
+      }
+
+      function loadStream() {
+        if (!playerContainer.firstElementChild) {
+          const playerUrl = new URL("https://player.twitch.tv/");
+          playerUrl.searchParams.set("channel", channel);
+          playerUrl.searchParams.set("parent", parent);
+          playerUrl.searchParams.set("autoplay", "false");
+
+          playerContainer.appendChild(
+            makeIframe(
+              playerUrl.toString(),
+              "T3xaskobold Twitch-Livestream",
+              "autoplay; fullscreen"
+            )
+          );
+        }
+
+        if (!chatContainer.firstElementChild) {
+          const chatUrl = new URL(
+            "https://www.twitch.tv/embed/" +
+            encodeURIComponent(channel) +
+            "/chat"
+          );
+
+          chatUrl.searchParams.set("parent", parent);
+          chatUrl.searchParams.set("darkpopout", "true");
+
+          chatContainer.appendChild(
+            makeIframe(
+              chatUrl.toString(),
+              "T3xaskobold Twitch-Live-Chat"
+            )
+          );
+        }
+      }
+
+      function showPage() {
+        const livestream = window.location.hash === "#livestream";
+
+        streamPage.hidden = !livestream;
+        gamehubPage.hidden = livestream;
+
+        if (livestream) {
+          loadStream();
+        } else {
+          // Player entfernen, damit die Wiedergabe
+          // beim Verlassen der Stream-Seite stoppt.
+          playerContainer.replaceChildren();
+          chatContainer.replaceChildren();
+        }
+
+        window.scrollTo(0, 0);
+      }
+
+      window.addEventListener("hashchange", showPage);
+      showPage();
+    })();
+  </script>
 
   <!-- APP-INSTALLATION BEIBEHALTEN -->
 
