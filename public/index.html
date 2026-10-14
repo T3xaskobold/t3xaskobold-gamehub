@@ -5,14 +5,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c0b16">
-
   <title>T3xaskobold | GameHub</title>
 
   <link rel="stylesheet" href="./style.css">
-
-  <!-- GameHub-App -->
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png">
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="GameHub">
@@ -23,11 +21,11 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 14px;
-      margin: 20px 0 28px;
-      padding: 18px;
-      border: 1px solid rgba(179, 109, 255, .5);
-      border-radius: 18px;
-      background: linear-gradient(135deg, #291747, #171123);
+      margin: 16px 0 24px;
+      padding: 16px;
+      border: 1px solid rgba(179,109,255,.5);
+      border-radius: 16px;
+      background: linear-gradient(135deg,#291747,#171123);
     }
 
     .app-install-banner[hidden],
@@ -36,12 +34,11 @@
     }
 
     .app-install-icon {
-      width: 76px;
-      height: 76px;
+      width: 64px;
+      height: 64px;
       object-fit: cover;
-      border-radius: 18px;
+      border-radius: 14px;
       border: 2px solid #9d58e7;
-      flex-shrink: 0;
     }
 
     .app-install-text {
@@ -50,8 +47,7 @@
 
     .app-install-text strong {
       display: block;
-      font-size: 1.1rem;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .app-install-text p {
@@ -63,9 +59,9 @@
     .app-install-button {
       background: #9850ed;
       color: white;
-      border: none;
+      border: 0;
       border-radius: 12px;
-      padding: 13px 18px;
+      padding: 12px 16px;
       font: inherit;
       font-weight: bold;
       cursor: pointer;
@@ -73,26 +69,19 @@
 
     .app-install-help {
       width: 100%;
-      background: rgba(0, 0, 0, .3);
+      background: rgba(0,0,0,.3);
       border-radius: 12px;
       padding: 14px;
-      line-height: 1.7;
+      line-height: 1.6;
     }
 
     .app-install-help p {
       margin: 0 0 8px;
     }
-
-    @media (max-width: 600px) {
-      .app-install-button {
-        width: 100%;
-      }
-    }
   </style>
 </head>
 
 <body>
-
   <header>
     <a class="brand" href="./">
       🎮 <strong>T3xaskobold</strong>
@@ -103,7 +92,6 @@
       <a href="https://www.twitch.tv/t3xaskobold"
          target="_blank"
          rel="noopener">💜 Twitch</a>
-
       <div id="account">Lade…</div>
     </nav>
   </header>
@@ -112,60 +100,50 @@
 
     <!-- APP INSTALLIEREN -->
 
-    <section
-      id="appInstallBanner"
-      class="app-install-banner"
-      hidden
-    >
+    <section id="appInstallBanner"
+             class="app-install-banner"
+             hidden>
+
       <img
         class="app-install-icon"
         src="./8DA70EE8-D516-419D-8219-6A8D1348B4B4.png"
-        alt="Unser T3xaskobold-Kobold"
+        alt="T3xaskobold-Kobold"
       >
 
       <div class="app-install-text">
         <strong>👾 GameHub immer dabei!</strong>
         <p>
-          Installiere unsere kostenlose GameHub-App
-          mit dem lila Kobold auf deinem Handy! 💜
+          Installiere die kostenlose GameHub-App
+          mit unserem lila Kobold! 💜
         </p>
       </div>
 
-      <button
-        id="appInstallButton"
-        class="app-install-button"
-        type="button"
-        aria-controls="appInstallHelp"
-        aria-expanded="false"
-      >
+      <button id="appInstallButton"
+              class="app-install-button"
+              type="button"
+              aria-controls="appInstallHelp"
+              aria-expanded="false">
         📲 App installieren
       </button>
 
-      <div
-        id="appInstallHelp"
-        class="app-install-help"
-        hidden
-        aria-live="polite"
-      ></div>
+      <div id="appInstallHelp"
+           class="app-install-help"
+           hidden
+           aria-live="polite"></div>
     </section>
 
-    <!-- STARTBEREICH -->
+    <!-- KOMPAKTER STARTBEREICH -->
 
     <section class="hero">
       <div class="eyebrow">✦ COMMUNITY GAME HUB ✦</div>
-
       <h1>
         Deine Ideen.<br>
         <em>Unsere Abenteuer.</em>
       </h1>
-
       <p>
-        Welche Games wurden schon gezockt?
-        Was steht als Nächstes an?
-        Bestimme mit, welches Spiel auf
-        T3xaskobolds Twitch-Kanal kommt.
+        Entdecke unsere Games, stimme für Spielwünsche
+        ab und sieh, was gerade im Stream läuft.
       </p>
-
       <a class="primary" href="#vorschlagen">
         🎯 Spiel vorschlagen
       </a>
@@ -178,128 +156,174 @@
         <b id="playedCount">0</b>
         <small>Gespielt</small>
       </div>
-
       <div>
         <b id="plannedCount">0</b>
         <small>Geplant</small>
       </div>
-
       <div>
         <b id="suggestedCount">0</b>
-        <small>Freigegebene Vorschläge</small>
+        <small>Vorschläge</small>
       </div>
     </section>
 
-    <!-- SPIEL VORSCHLAGEN -->
+    <!-- 1. SPIELVORSCHLÄGE -->
 
     <section id="vorschlagen" class="panel">
       <span class="eyebrow">DEINE STIMME ZÄHLT</span>
-
       <h2>💡 Spiel vorschlagen</h2>
-
       <p>
-        Logge dich mit Twitch ein und schicke
-        deinen Wunsch ins Rennen.
-        Vorschläge werden erst nach Freigabe öffentlich.
+        Melde dich mit Twitch an und schlage ein Spiel vor.
+        Vorschläge erscheinen nach der Freigabe.
       </p>
 
       <form id="suggestForm">
-
         <label for="title">Spielname</label>
-        <input
-          id="title"
-          maxlength="100"
-          minlength="2"
-          required
-          placeholder="Welches Spiel sollen wir zocken?"
-        >
+        <input id="title"
+               maxlength="100"
+               minlength="2"
+               required
+               placeholder="Welches Spiel sollen wir zocken?">
 
         <label for="description">
           Warum dieses Spiel? (optional)
         </label>
-        <textarea
-          id="description"
-          maxlength="500"
-          rows="3"
-          placeholder="Deine Idee ..."
-        ></textarea>
+        <textarea id="description"
+                  maxlength="500"
+                  rows="3"
+                  placeholder="Deine Idee ..."></textarea>
 
         <button class="primary" type="submit">
           Vorschlag einreichen ↗
         </button>
-
       </form>
     </section>
 
-    <!-- SPIELWÜNSCHE -->
-
-    <section>
-      <div class="sectionHeading">
-        <div>
-          <span class="eyebrow">COMMUNITY FAVORITEN</span>
-          <h2>🏆 Eure Spielwünsche</h2>
-        </div>
-
+    <details class="game-category" id="suggestedSection">
+      <summary>
+        <span>🏆 Eure Spielwünsche</span>
+        <span class="category-right">
+          <span id="suggestedCategoryCount"
+                class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+        </span>
+      </summary>
+      <div class="category-content">
         <p>Ein Twitch-Account, eine Stimme pro Vorschlag.</p>
+        <div id="suggested" class="grid"></div>
       </div>
+    </details>
 
-      <div id="suggested" class="grid"></div>
-    </section>
+    <!-- 2. AKTUELL GESPIELT -->
 
-    <!-- GEPLANTE SPIELE -->
-
-    <section>
+    <section class="current-game-section">
       <div class="sectionHeading">
-        <div>
-          <span class="eyebrow">BALD IM STREAM</span>
-          <h2>🚀 Geplante Games</h2>
-        </div>
+        <h2>🟢 Aktuell gespielt</h2>
       </div>
-
-      <div id="planned" class="grid"></div>
+      <div id="playing" class="grid"></div>
     </section>
 
-    <!-- GESPIELTE SPIELE -->
+    <!-- SUCHE UND SORTIERUNG -->
 
-    <section>
-      <div class="sectionHeading">
-        <div>
-          <span class="eyebrow">ERFOLGREICH GEZOCKT</span>
-          <h2>✅ Bereits gespielt</h2>
-        </div>
-      </div>
+    <section class="game-filters" aria-label="Spiele suchen und sortieren">
+      <label for="gameFilter">🔎 Spiele suchen</label>
+      <input id="gameFilter"
+             type="search"
+             placeholder="Spielname eingeben ...">
 
-      <div id="played" class="grid"></div>
+      <label for="gameSort">Sortieren nach</label>
+      <select id="gameSort">
+        <option value="alphabetical">🔤 Alphabetisch (A–Z)</option>
+        <option value="newest">🆕 Zuletzt hinzugefügt</option>
+        <option value="lastPlayed">🎮 Zuletzt gespielt</option>
+      </select>
     </section>
 
-    <!-- Abgebrochene Games: automatisch durch app.js -->
+    <!-- 3. PAUSIERT -->
+
+    <details class="game-category" id="pausedSection">
+      <summary>
+        <span>⏸️ Pausiert</span>
+        <span class="category-right">
+          <span id="pausedCount" class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+        </span>
+      </summary>
+      <div class="category-content">
+        <div id="paused" class="grid"></div>
+      </div>
+    </details>
+
+    <!-- 4. GEPLANT -->
+
+    <details class="game-category" id="plannedSection">
+      <summary>
+        <span>🚀 Geplant</span>
+        <span class="category-right">
+          <span id="plannedCategoryCount"
+                class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+        </span>
+      </summary>
+      <div class="category-content">
+        <div id="planned" class="grid"></div>
+      </div>
+    </details>
+
+    <!-- 5. GESPIELT -->
+
+    <details class="game-category" id="playedSection">
+      <summary>
+        <span>✅ Gespielt</span>
+        <span class="category-right">
+          <span id="playedCategoryCount"
+                class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+        </span>
+      </summary>
+      <div class="category-content">
+        <div id="played" class="grid"></div>
+      </div>
+    </details>
+
+    <!-- 6. ABGEBROCHEN -->
+
+    <details class="game-category" id="abandonedSection">
+      <summary>
+        <span>❌ Abgebrochen</span>
+        <span class="category-right">
+          <span id="abandonedCount"
+                class="category-count">0</span>
+          <span class="category-arrow">⌄</span>
+        </span>
+      </summary>
+      <div class="category-content">
+        <div id="abandoned" class="grid"></div>
+      </div>
+    </details>
 
     <!-- ADMIN -->
 
     <section id="adminSection" class="panel hidden">
       <span class="eyebrow">NUR FÜR DEN KANALINHABER</span>
-
       <h2>🛡️ Admin-Bereich</h2>
+
       <h3>Neues Spiel</h3>
-
       <form id="gameForm">
-
         <label for="gameTitle">Spielname</label>
         <input id="gameTitle" required maxlength="150">
 
         <label for="gameDescription">
           Beschreibung (optional)
         </label>
-        <textarea
-          id="gameDescription"
-          maxlength="2000"
-        ></textarea>
+        <textarea id="gameDescription"
+                  maxlength="2000"></textarea>
 
         <label for="gameStatus">Status</label>
         <select id="gameStatus">
-          <option value="planned">Geplant</option>
-          <option value="playing">Wird gespielt</option>
-          <option value="played">Gespielt</option>
+          <option value="planned">🚀 Geplant</option>
+          <option value="playing">🟢 Aktuell gespielt</option>
+          <option value="paused">⏸️ Pausiert</option>
+          <option value="played">✅ Gespielt</option>
           <option value="abandoned">❌ Abgebrochen</option>
         </select>
 
@@ -315,8 +339,9 @@
       <div id="adminGames"></div>
     </section>
 
-    <div id="notice" role="status" aria-live="polite"></div>
-
+    <div id="notice"
+         role="status"
+         aria-live="polite"></div>
   </main>
 
   <footer>
@@ -328,7 +353,8 @@
 
   <script type="module" src="./app.js"></script>
 
-  <!-- Installationsbutton -->
+  <!-- APP-INSTALLATION BEIBEHALTEN -->
+
   <script>
     (function () {
       const banner = document.getElementById("appInstallBanner");
@@ -368,8 +394,7 @@
           help.innerHTML =
             "<p><strong>📱 GameHub auf dem iPhone installieren:</strong></p>" +
             "<p>1. Öffne GameHub in Safari.</p>" +
-            "<p>2. Tippe auf das Teilen-Symbol " +
-            "(Quadrat mit Pfeil nach oben).</p>" +
+            "<p>2. Tippe auf das Teilen-Symbol.</p>" +
             "<p>3. Wähle <strong>Zum Home-Bildschirm</strong>.</p>" +
             "<p>4. Tippe auf <strong>Hinzufügen</strong>.</p>" +
             "<p>Fertig! 👾💜</p>";
@@ -389,6 +414,5 @@
       });
     })();
   </script>
-
 </body>
 </html>
