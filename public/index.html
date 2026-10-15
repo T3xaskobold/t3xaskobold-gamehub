@@ -471,16 +471,16 @@
       flex-basis: 27px;
     }
 
-    /* NEU: AUTOMATISCHE LIVE-ANZEIGE */
+    /* LIVE-FENSTER: LILA DESIGN, GRÜNE AKZENTE */
 
     .kobold-live-banner {
       display: block;
       margin: 18px 0 24px;
       padding: 18px;
-      border: 1px solid rgba(64,220,125,.8);
+      border: 1px solid rgba(179,109,255,.5);
       border-radius: 18px;
-      background: linear-gradient(135deg,#17372b,#181827 75%);
-      box-shadow: 0 0 24px rgba(46,200,112,.12);
+      background: linear-gradient(135deg,#291747,#171123);
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
       color: #fff;
       text-decoration: none;
       transition: transform .2s, box-shadow .2s;
@@ -492,7 +492,7 @@
 
     .kobold-live-banner:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(46,200,112,.22);
+      box-shadow: 0 12px 28px rgba(0,0,0,.28);
     }
 
     .kobold-live-top {
@@ -511,6 +511,7 @@
       display: inline-flex;
       align-items: center;
       gap: 9px;
+      color: #62f29d;
     }
 
     .kobold-live-antenna svg {
@@ -554,7 +555,7 @@
 
     .kobold-live-description {
       display: block;
-      color: #d8e9df;
+      color: #d6c8e6;
       line-height: 1.5;
       overflow-wrap: anywhere;
     }
@@ -562,12 +563,18 @@
     .kobold-live-action {
       display: block;
       margin-top: 16px;
-      color: #62f29d;
+      color: #d6a8ff;
       font-weight: 800;
     }
 
     @keyframes kobold-live-pulse {
       50% { opacity: .35; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kobold-live-dot {
+        animation: none;
+      }
     }
 
     @media (min-width: 950px) {
@@ -976,7 +983,7 @@
              aria-live="polite"></div>
       </section>
 
-      <!-- NEU: LIVE-FENSTER NUR WENN WIRKLICH LIVE -->
+      <!-- LIVE-FENSTER NUR WENN WIRKLICH LIVE -->
 
       <a id="koboldLiveBanner"
          class="kobold-live-banner"
@@ -1564,7 +1571,7 @@
     })();
   </script>
 
-  <!-- NEU: AUTOMATISCHER TWITCH-LIVE-STATUS -->
+  <!-- AUTOMATISCHER TWITCH-LIVE-STATUS -->
 
   <script>
     (function () {
@@ -1576,8 +1583,8 @@
 
       if (!banner || !description) return;
 
-      // Diese Adresse muss zu deiner API-Datei passen:
-      const LIVE_API_URL = "/api/live-status";
+      // Die funktionierende API-Datei api/live.js
+      const LIVE_API_URL = "/api/live";
 
       async function checkTwitchLive() {
         try {
