@@ -824,3 +824,28 @@ footer {
     padding: 18px;
   }
 }
+
+/* T3 Kirschblüten-Edition */
+:root { color:#fff1fa; background:#0d0710; }
+body { background:linear-gradient(180deg,rgba(12,5,15,.38) 0%,#100a16 620px),url('t3-kirschblueten.png') center top / 100% auto no-repeat,#100a16; }
+.hero { min-height:260px; padding-top:65px; text-shadow:0 3px 20px #08020d; }
+.eyebrow,.brand span {color:#ffa6d8}
+.hero h1 em,.stats b {color:#ff9bdc}
+a {color:#ffaddd}
+.primary {background:linear-gradient(120deg,#c12f84,#8e3dbe)}
+.stats div,.panel,.game {background:rgba(20,11,27,.92);border-color:rgba(238,117,190,.28);backdrop-filter:blur(9px)}
+.admin-tools {display:grid;grid-template-columns:minmax(150px,2fr) repeat(2,minmax(130px,1fr));gap:10px;margin:12px 0 16px}
+.admin-tools input,.admin-tools select {width:100%;min-width:0;background:#211327;color:#ffe9f8;border:1px solid #8b4979;border-radius:10px;padding:11px}
+.admin-entry {border:1px solid #663652;background:rgba(33,17,39,.88);border-radius:12px;margin:8px 0;overflow:hidden}
+.admin-entry summary {cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;list-style:none}
+.admin-entry summary::-webkit-details-marker {display:none}
+.admin-entry summary small {display:block;color:#e7a9cf;margin-top:4px}
+.admin-expand {font-size:12px;color:#ffb3dd;white-space:nowrap}
+.admin-entry[open] .admin-expand {color:#fff}
+.admin-entry p {padding:0 16px;color:#e7d4e5}
+.admin-actions {padding:12px 14px;border-top:1px solid #6a3c61;display:flex;gap:6px;flex-wrap:wrap}
+.admin-actions button,.admin-pager button {padding:9px 11px;border-radius:9px;background:#39213f;color:#fff0fa;border:1px solid #9e5d8d}
+.admin-actions button:hover,.admin-pager button:hover:not(:disabled) {background:#603052}
+.admin-pager {display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin:12px 0 26px;color:#f4c6e1}
+.admin-pager span {margin-right:auto}
+@media(max-width:700px){body{background-size:auto 430px}.admin-tools{grid-template-columns:1fr}.hero{min-height:180px;padding-top:35px}}
