@@ -1252,10 +1252,20 @@
         </form>
 
         <h3>Vorschläge verwalten</h3>
-        <div id="adminSuggestions"></div>
+        <div class="admin-tools">
+          <input id="suggestionAdminSearch" type="search" placeholder="Vorschlag suchen …" aria-label="Vorschlag suchen">
+          <select id="suggestionAdminStatus" aria-label="Vorschläge nach Status filtern"><option value="all">Alle Vorschläge</option><option value="pending">Offen</option><option value="approved">Freigegeben</option><option value="rejected">Abgelehnt</option></select>
+          <select id="suggestionAdminSort" aria-label="Vorschläge sortieren"><option value="new">Zuletzt hinzugefügt</option><option value="old">Älteste zuerst</option><option value="az">Name A–Z</option><option value="za">Name Z–A</option></select>
+        </div>
+        <div id="adminSuggestions"></div><div id="suggestionAdminPager" class="admin-pager"></div>
 
         <h3>Spiele verwalten</h3>
-        <div id="adminGames"></div>
+        <div class="admin-tools">
+          <input id="gameAdminSearch" type="search" placeholder="Spiel suchen …" aria-label="Spiel suchen">
+          <select id="gameAdminStatus" aria-label="Spiele nach Status filtern"><option value="all">Alle Spiele</option><option value="planned">Geplant</option><option value="playing">Aktuell</option><option value="paused">Pausiert</option><option value="played">Gespielt</option><option value="abandoned">Abgebrochen</option></select>
+          <select id="gameAdminSort" aria-label="Spiele sortieren"><option value="new">Zuletzt hinzugefügt</option><option value="old">Älteste zuerst</option><option value="az">Name A–Z</option><option value="za">Name Z–A</option></select>
+        </div>
+        <div id="adminGames"></div><div id="gameAdminPager" class="admin-pager"></div>
       </section>
 
       <!-- SOCIALS IM GAMEHUB -->
