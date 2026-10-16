@@ -984,84 +984,65 @@ async function changeGameStatus(id, status) {
 
 // ADMIN-BEREICH
 
+const adminListState = {
+  suggestions: { page: 1 }, games: { page: 1 }
+};
+
+function adminList(kind) {
+  const suggestion = kind === 'suggestions';
+  const prefix = suggestion ? 'suggestionAdmin' : 'gameAdmin';
+  const items = suggestion ? allSuggestions : allGames;
+  const query = ($(prefix + 'Search')?.value || '').trim().toLocaleLowerCase();
+  const status = $(prefix + 'Status')?.value || 'all';
+  const sort = $(prefix + 'Sort')?.value || 'new';
+  const filtered = items.filter(item =>
+    item.title.toLocaleLowerCase().includes(query) &&
+    (status === 'all' || item.status === status)
+  ).sort((a, b) => {
+    if (sort === 'az' || sort === 'za') {
+      return a.title.localeCompare(b.title, 'de') * (sort === 'az' ? 1 : -1);
+    }
+    const da = Date.parse(a.created_at || '') || 0;
+    const db = Date.parse(b.created_at || '') || 0;
+    return (da - db) * (sort === 'new' ? -1 : 1);
+  });
+  const totalPages = Math.max(1, Math.ceil(filtered.length / 10));
+  const state = adminListState[kind];
+  state.page = Math.min(Math.max(1, state.page), totalPages);
+  const visible = filtered.slice((state.page - 1) * 10, state.page * 10);
+  const container = $(suggestion ? 'adminSuggestions' : 'adminGames');
+  container.innerHTML = visible.length ? visible.map(item => `
+    <details class="admin-entry">
+      <summary><span><b>${esc(item.title)}</b><small>${esc(suggestion ? item.status : statusLabel(item.status))}</small></span><span class="admin-expand">Bearbeiten ▾</span></summary>
+      ${item.description ? `<p>${esc(item.description)}</p>` : ''}
+      <div class="admin-actions">
+        ${suggestion ? `
+          <button data-suggestion="${item.id}" data-sstatus="approved">Freigeben</button>
+          <button data-suggestion="${item.id}" data-sstatus="rejected">Ablehnen</button>
+          <button data-suggestion="${item.id}" data-sstatus="pending">Zurückstellen</button>
+          <button class="danger" data-sdelete="${item.id}">Löschen</button>` : `
+          <button data-game="${item.id}" data-gstatus="playing">🟢 Aktuell</button>
+          <button data-game="${item.id}" data-gstatus="paused">⏸️ Pausiert</button>
+          <button data-game="${item.id}" data-gstatus="planned">🚀 Geplant</button>
+          <button data-game="${item.id}" data-gstatus="played">✅ Gespielt</button>
+          <button data-game="${item.id}" data-gstatus="abandoned">❌ Abgebrochen</button>
+          <button class="danger" data-gdelete="${item.id}">Löschen</button>`}
+      </div>
+    </details>`).join('') : '<p>Keine passenden Einträge gefunden.</p>';
+  const pager = $(suggestion ? 'suggestionAdminPager' : 'gameAdminPager');
+  pager.innerHTML = `<span>${filtered.length} Einträge · Seite ${state.page} von ${totalPages}</span>
+    <button data-admin-page="prev" data-kind="${kind}" ${state.page === 1 ? 'disabled' : ''}>← Zurück</button>
+    <button data-admin-page="next" data-kind="${kind}" ${state.page === totalPages ? 'disabled' : ''}>Weiter →</button>`;
+  pager.querySelectorAll('[data-admin-page]').forEach(button => button.onclick = () => {
+    state.page += button.dataset.adminPage === 'next' ? 1 : -1;
+    setupAdmin();
+  });
+}
+
 function setupAdmin() {
   if (!admin) return;
-
-  $('adminSuggestions').innerHTML = allSuggestions.length
-    ? allSuggestions.map(suggestion => `
-        <div class="adminrow">
-          <span>
-            <b>${esc(suggestion.title)}</b>
-            <small>(${esc(suggestion.status)})</small>
-          </span>
-
-          <div>
-            <button data-suggestion="${suggestion.id}"
-                    data-sstatus="approved">
-              Freigeben
-            </button>
-
-            <button data-suggestion="${suggestion.id}"
-                    data-sstatus="rejected">
-              Ablehnen
-            </button>
-
-            <button data-suggestion="${suggestion.id}"
-                    data-sstatus="pending">
-              Zurückstellen
-            </button>
-
-            <button class="danger"
-                    data-sdelete="${suggestion.id}">
-              Löschen
-            </button>
-          </div>
-        </div>
-      `).join('')
-    : empty();
-
-  $('adminGames').innerHTML = allGames.length
-    ? allGames.map(game => `
-        <div class="adminrow">
-          <span>
-            <b>${esc(game.title)}</b>
-            <small>(${esc(statusLabel(game.status))})</small>
-          </span>
-
-          <div>
-            <button data-game="${game.id}"
-                    data-gstatus="playing">
-              🟢 Aktuell
-            </button>
-
-            <button data-game="${game.id}"
-                    data-gstatus="paused">
-              ⏸️ Pausiert
-            </button>
-
-            <button data-game="${game.id}"
-                    data-gstatus="planned">
-              🚀 Geplant
-            </button>
-
-            <button data-game="${game.id}"
-                    data-gstatus="played">
-              ✅ Gespielt
-            </button>
-
-            <button data-game="${game.id}"
-                    data-gstatus="abandoned">
-              ❌ Abgebrochen
-            </button>
-
-            <button class="danger"
-                    data-gdelete="${game.id}">
-              Löschen
-            </button>
-          </div>
-        </div>
-      `).join('')
-    : empty();
+  adminList('suggestions');
+  adminList('games');
 
   document.querySelectorAll('[data-sstatus]').forEach(button => {
     button.onclick = async () => {
@@ -1132,6 +1113,18 @@ function setupAdmin() {
       }
     };
   });
+}
+
+// Admin-Filter nur einmal registrieren; die Auswahl bleibt beim Neuladen erhalten.
+for (const kind of ['suggestions', 'games']) {
+  const prefix = kind === 'suggestions' ? 'suggestionAdmin' : 'gameAdmin';
+  for (const suffix of ['Search', 'Status', 'Sort']) {
+    const control = $(prefix + suffix);
+    control?.addEventListener(suffix === 'Search' ? 'input' : 'change', () => {
+      adminListState[kind].page = 1;
+      setupAdmin();
+    });
+  }
 }
 
 // DATEN LADEN
